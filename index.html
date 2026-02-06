@@ -503,6 +503,30 @@
                 transform: translateY(100vh) rotate(720deg);
             }
         }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 200;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 
@@ -556,8 +580,10 @@
             </div>
 
             <div class="hand-indicators">
-                <div id="hand-left" class="hand">LEFT HAND</div>
-                <div id="hand-right" class="hand">RIGHT HAND</div>
+                <div id="hand-left" class="hand">LEFT HAND <span id="finger-name-left"
+                        style="color: var(--accent);"></span></div>
+                <div id="hand-right" class="hand"><span id="finger-name-right" style="color: var(--accent);"></span>
+                    RIGHT HAND</div>
             </div>
 
             <div class="keyboard" id="keyboard">
@@ -583,6 +609,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
 
     <script>
         class TypingApp {
@@ -801,6 +830,19 @@
                 this.resetGame();
             }
 
+            showToast(message, duration = 3000) {
+                const toast = document.getElementById('toast');
+                toast.innerText = message;
+                toast.classList.add('show');
+
+                // Clear existing timeout if any
+                if (this.toastTimeout) clearTimeout(this.toastTimeout);
+
+                this.toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, duration);
+            }
+
             resetGame() {
                 this.score = 0;
                 this.currentIndex = 0;
@@ -950,11 +992,7 @@
                 const isControlKey = e.key.length > 1;
 
                 if (!isEnglishChar && !isControlKey) {
-                    if (!window.imeAlertShown) {
-                        alert("⚠️ Please switch input source to English!");
-                        window.imeAlertShown = true;
-                        setTimeout(() => window.imeAlertShown = false, 3000);
-                    }
+                    this.showToast("⚠️ Please switch input source to English!");
                     return;
                 }
 
@@ -1019,6 +1057,8 @@
                 document.querySelectorAll('.key.target').forEach(k => k.classList.remove('target'));
                 document.getElementById('hand-left').classList.remove('active');
                 document.getElementById('hand-right').classList.remove('active');
+                document.getElementById('finger-name-left').innerText = "";
+                document.getElementById('finger-name-right').innerText = "";
 
                 if (this.currentIndex >= this.text.length) return;
 
@@ -1032,8 +1072,42 @@
                 if (keyDiv) {
                     keyDiv.classList.add('target');
                     const hand = keyDiv.dataset.hand;
-                    if (hand === 'L') document.getElementById('hand-left').classList.add('active');
-                    if (hand === 'R') document.getElementById('hand-right').classList.add('active');
+
+                    // Determine Finger Name and Color
+                    let fingerName = "";
+                    let fingerColorVar = "";
+
+                    if (keyDiv.classList.contains('f-pinky')) { fingerName = "Pinky"; fingerColorVar = "var(--f-pinky)"; }
+                    else if (keyDiv.classList.contains('f-ring')) { fingerName = "Ring"; fingerColorVar = "var(--f-ring)"; }
+                    else if (keyDiv.classList.contains('f-middle')) { fingerName = "Middle"; fingerColorVar = "var(--f-middle)"; }
+                    else if (keyDiv.classList.contains('f-index')) { fingerName = "Index"; fingerColorVar = "var(--f-index)"; }
+                    else if (keyDiv.classList.contains('f-thumb')) { fingerName = "Thumb"; fingerColorVar = "var(--f-thumb)"; }
+
+                    if (hand === 'L') {
+                        document.getElementById('hand-left').classList.add('active');
+                        const el = document.getElementById('finger-name-left');
+                        el.innerText = ": " + fingerName;
+                        el.style.color = fingerColorVar;
+                    }
+                    if (hand === 'R') {
+                        document.getElementById('hand-right').classList.add('active');
+                        const el = document.getElementById('finger-name-right');
+                        el.innerText = fingerName + " :";
+                        el.style.color = fingerColorVar;
+                    }
+
+                    if (code === 'Space') {
+                        document.getElementById('hand-left').classList.add('active');
+                        document.getElementById('hand-right').classList.add('active');
+
+                        const elLeft = document.getElementById('finger-name-left');
+                        elLeft.innerText = ": Thumb";
+                        elLeft.style.color = "var(--f-thumb)";
+
+                        const elRight = document.getElementById('finger-name-right');
+                        elRight.innerText = "Thumb :";
+                        elRight.style.color = "var(--f-thumb)";
+                    }
 
                     if (char && char.match(/[A-Z!@#$%^&*()_+{}:"<>?]/)) {
                         const shiftKey = document.querySelector('.key[data-code="ShiftLeft"]');
