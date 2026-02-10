@@ -5,7 +5,7 @@ An engaging, magical typing adventure designed to help kids establish healthy ty
 ## 🎮 Features
 
 - **🖐 Finger Drills**: Learn which fingers to use for each key with color-coded visual aids.
-- **🌈 Adventure Mode**: Progress through 10 themed levels, from 3-letter animals to full sentences.
+- **🌈 Adventure Mode**: Progress through 20 themed levels, from colors and animals to phrases.
 - **⭐ Star Rush**: A fast-paced arcade mode to test speed and accuracy.
 - **🔊 Interactive Sound**: Fun sound effects for correct and incorrect keystrokes.
 - **🏆 Progression System**: Earn stars and track high scores.

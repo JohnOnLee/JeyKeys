@@ -186,18 +186,17 @@
         .levels-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
+            gap: 8px;
         }
 
         .level-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
-            padding: 15px;
+            border-radius: 10px;
+            padding: 8px 6px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
-            aspect-ratio: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -211,21 +210,21 @@
         }
 
         .level-num {
-            font-size: 1.5rem;
+            font-size: 1rem;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
             color: var(--accent);
         }
 
         .level-name {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             opacity: 0.9;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .stars {
-            margin-top: 5px;
-            font-size: 0.9rem;
+            margin-top: 2px;
+            font-size: 0.7rem;
             color: #444;
         }
 
@@ -636,19 +635,28 @@
                     { name: "Capitals", chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", content: "Hello World\nMagic Star\nMoon Light" }
                 ];
 
-                // From Index-2: Adventure Levels - CONVERTED TO ARRAYS for preserving logic
-                // From Index-2: Adventure Levels - CONVERTED TO ARRAYS for preserving logic
+                // Adventure Levels - themed word groups for progressive typing practice
                 this.adventureLevels = [
-                    { id: 1, name: "3-Letter Animals", icon: "🐶", words: ["cat", "dog", "pig", "fox", "cow", "rat", "bat", "bug", "ant", "bee", "sun", "sky", "owl", "elk", "yak", "ape", "emu", "jay"] },
-                    { id: 2, name: "4-Letter Words", icon: "🐻", words: ["duck", "fish", "bird", "frog", "lion", "bear", "wolf", "deer", "goat", "lamb", "seal", "swan", "crab", "pony", "kite", "ball", "doll", "drum"] },
-                    { id: 3, name: "5-Letter Words", icon: "🐯", words: ["apple", "grape", "lemon", "melon", "berry", "peach", "mango", "pizza", "bread", "water", "tiger", "zebra", "panda", "koala", "sheep", "horse", "whale", "shark", "eagle"] },
-                    { id: 4, name: "School Things", icon: "🎒", words: ["school", "pencil", "eraser", "crayon", "paper", "ruler", "book", "desk", "chair", "class", "board", "chalk", "glue", "paint", "lunch", "recess", "math", "music", "art"] },
-                    { id: 5, name: "Family", icon: "👨‍👩‍👧‍👦", words: ["friend", "family", "mother", "father", "sister", "brother", "cousin", "grandma", "grandpa", "baby", "uncle", "aunt", "parent", "nephew", "niece"] },
-                    { id: 6, name: "Nature", icon: "🌳", words: ["garden", "flower", "forest", "jungle", "desert", "ocean", "river", "cloud", "storm", "rain", "snow", "wind", "leaf", "tree", "grass", "hill", "lake", "moon", "star"] },
-                    { id: 7, name: "Verbs", icon: "🏃", words: ["playing", "jumping", "running", "walking", "eating", "sleeping", "reading", "writing", "drawing", "dancing", "singing", "swimming", "flying", "talking", "listening", "helping"] },
-                    { id: 8, name: "Adventure", icon: "🏰", words: ["happiness", "rainbow", "butterfly", "dinosaur", "astronaut", "treasure", "pirate", "wizard", "dragon", "magic", "castle", "unicorn", "hero", "fairy", "explore", "planet", "rocket"] },
-                    { id: 9, name: "Phrases", icon: "💬", words: ["red apple", "big dog", "fast car", "blue sky", "hot sun", "green grass", "small cat", "funny clown", "sweet candy", "cool breeze", "loud drum", "happy baby", "tall tree", "yellow bus", "dark night", "bright star"] },
-                    { id: 10, name: "Sentences", icon: "📝", words: ["The quick brown fox jumps over the lazy dog.", "I love learning to type.", "Practice makes perfect.", "The sun shines bright.", "Birds fly in the sky.", "Fish swim in the sea.", "We like to play games.", "Reading books is fun.", "My friend is kind.", "Eat your vegetables.", "Drink plenty of water.", "Always say thank you.", "Be nice to others."] }
+                    { id: 1, name: "Colors", icon: "🎨", words: ["red", "blue", "green", "yellow", "purple", "orange", "pink", "black", "white", "brown", "gray", "gold", "silver", "violet", "coral", "teal", "navy", "cream"] },
+                    { id: 2, name: "Pets", icon: "🐾", words: ["cat", "dog", "hamster", "bunny", "goldfish", "parrot", "turtle", "kitten", "puppy", "guinea pig", "canary", "ferret", "pony", "gecko", "gerbil", "rabbit"] },
+                    { id: 3, name: "Zoo Animals", icon: "🦁", words: ["lion", "tiger", "elephant", "giraffe", "zebra", "panda", "penguin", "monkey", "hippo", "koala", "gorilla", "kangaroo", "cheetah", "flamingo", "rhino", "otter", "sloth", "peacock"] },
+                    { id: 4, name: "Fruits", icon: "🍎", words: ["apple", "banana", "grape", "mango", "peach", "cherry", "strawberry", "orange", "lemon", "melon", "berry", "pear", "plum", "kiwi", "coconut", "papaya", "fig", "lime"] },
+                    { id: 5, name: "Vegetables", icon: "🥕", words: ["carrot", "potato", "tomato", "spinach", "broccoli", "pepper", "onion", "corn", "celery", "lettuce", "pumpkin", "peas", "beans", "garlic", "cabbage", "beet", "radish", "zucchini"] },
+                    { id: 6, name: "Kid Fav Food", icon: "🍕", words: ["pizza", "burger", "pasta", "taco", "nuggets", "pancake", "waffle", "hotdog", "noodles", "sandwich", "pretzel", "popcorn", "nachos", "sushi", "toast", "bagel", "fries", "rice"] },
+                    { id: 7, name: "Desserts", icon: "🍰", words: ["cake", "cookie", "donut", "candy", "brownie", "muffin", "pudding", "cupcake", "waffle", "pie", "fudge", "sundae", "toffee", "sorbet", "eclair", "truffle", "parfait", "gelato"] },
+                    { id: 8, name: "Flowers", icon: "🌸", words: ["rose", "daisy", "tulip", "lily", "sunflower", "orchid", "violet", "poppy", "peony", "iris", "lotus", "jasmine", "dahlia", "lilac", "pansy", "daffodil", "marigold", "bluebell"] },
+                    { id: 9, name: "Plants", icon: "🌿", words: ["fern", "cactus", "bamboo", "ivy", "moss", "shrub", "vine", "herb", "palm", "clover", "willow", "maple", "cedar", "birch", "oak", "pine", "spruce", "sage"] },
+                    { id: 10, name: "Vehicles", icon: "🚗", words: ["car", "bus", "truck", "train", "plane", "boat", "bike", "rocket", "scooter", "taxi", "van", "tram", "ferry", "subway", "canoe", "kayak", "yacht", "helicopter"] },
+                    { id: 11, name: "Art Supplies", icon: "🖍️", words: ["crayon", "pencil", "brush", "canvas", "marker", "chalk", "paint", "easel", "pastel", "palette", "sketch", "eraser", "ink", "glitter", "stencil", "clay", "charcoal", "glue"] },
+                    { id: 12, name: "Countries", icon: "🌍", words: ["Japan", "India", "Brazil", "France", "Canada", "Kenya", "Egypt", "Mexico", "Spain", "Italy", "China", "Peru", "Chile", "Norway", "Greece", "Cuba", "Nepal", "Ghana"] },
+                    { id: 13, name: "Capital Cities", icon: "🏛️", words: ["Tokyo", "Paris", "London", "Cairo", "Delhi", "Lima", "Rome", "Oslo", "Athens", "Havana", "Ottawa", "Seoul", "Berlin", "Madrid", "Dublin", "Nairobi", "Accra", "Hanoi"] },
+                    { id: 14, name: "School Things", icon: "🎒", words: ["school", "paper", "ruler", "book", "desk", "chair", "class", "board", "lunch", "recess", "math", "music", "teacher", "locker", "homework", "backpack", "notebook", "science"] },
+                    { id: 15, name: "Family", icon: "👨‍👩‍👧‍👦", words: ["friend", "family", "mother", "father", "sister", "brother", "cousin", "grandma", "grandpa", "baby", "uncle", "aunt", "parent", "nephew", "niece"] },
+                    { id: 16, name: "Nature", icon: "🌳", words: ["forest", "jungle", "ocean", "river", "cloud", "storm", "rain", "snow", "wind", "mountain", "valley", "canyon", "island", "glacier", "volcano", "meadow", "lake", "waterfall"] },
+                    { id: 17, name: "Verbs", icon: "🏃", words: ["playing", "jumping", "running", "walking", "eating", "sleeping", "reading", "writing", "drawing", "dancing", "singing", "swimming", "flying", "talking", "listening", "helping"] },
+                    { id: 18, name: "Adventure", icon: "🏰", words: ["happiness", "rainbow", "butterfly", "dinosaur", "astronaut", "treasure", "pirate", "wizard", "dragon", "magic", "castle", "unicorn", "hero", "fairy", "explore", "planet", "rocket"] },
+                    { id: 19, name: "Kid Book Titles", icon: "📚", words: ["Cat in the Hat", "Green Eggs and Ham", "The Very Hungry Caterpillar", "Goodnight Moon", "Where the Wild Things Are", "The Giving Tree", "Curious George", "Madeline", "Corduroy", "Chicka Chicka Boom Boom", "Brown Bear Brown Bear", "If You Give a Mouse a Cookie", "The Lorax", "Frog and Toad", "Clifford the Big Red Dog", "Amelia Bedelia"] },
+                    { id: 20, name: "Phrases", icon: "💬", words: ["red rose", "big elephant", "fast car", "blue sky", "hot pizza", "green fern", "cute puppy", "yummy cake", "cool train", "pink tulip", "fresh carrot", "sunny day", "tall giraffe", "sweet cherry", "happy parrot", "bright star"] }
                 ];
 
                 this.simpleWords = ["cat", "dog", "sun", "bat", "run", "sky", "fox", "cup", "hat", "pen", "box", "key", "ant", "bus", "car", "map", "top", "pop", "log", "pig", "cow", "rat", "bug", "bee", "toy", "bed", "fan", "pan", "pot", "lid", "red", "blue"];
@@ -936,10 +944,10 @@
             }
 
             generateRandomWords(count) {
-                // Collect all words from first 8 levels (exclude Phrases/Sentences)
+                // Collect all single words from levels 1-18 (exclude multi-word levels: Book Titles, Phrases, Sentences)
                 let allWords = [];
-                // Levels 1-8 are single words
-                for (let i = 0; i < 8; i++) {
+                const singleWordLevelCount = 18;
+                for (let i = 0; i < singleWordLevelCount; i++) {
                     allWords = allWords.concat(this.adventureLevels[i].words);
                 }
                 // Add simple words too
