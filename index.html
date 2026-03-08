@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JeyKeys - Kids Typing Adventure</title>
+    <title>JKeys - Kids Typing Adventure</title>
     <style>
         :root {
             --primary: #22c55e;
@@ -652,7 +652,7 @@
 
     <div class="container">
         <header>
-            <h1>✨ JeyKeys - Kids Typing Adventure</h1>
+            <h1>✨ JKeys - Kids Typing Adventure</h1>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span
                     style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; text-shadow: 0 0 5px rgba(0,0,0,0.5);">High
@@ -1463,11 +1463,11 @@
             }
 
             saveTheme(data) {
-                localStorage.setItem('jeykeysTheme', JSON.stringify(data));
+                localStorage.setItem('jkeysTheme', JSON.stringify(data));
             }
 
             loadTheme() {
-                const saved = localStorage.getItem('jeykeysTheme');
+                const saved = localStorage.getItem('jkeysTheme');
                 if (!saved) {
                     this.applyPresetTheme('forest');
                     return;

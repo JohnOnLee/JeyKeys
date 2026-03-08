@@ -1,4 +1,4 @@
-# ✨ JeyKeys - Kids Typing Adventure
+# ✨ JKeys - Kids Typing Adventure
 
 An engaging, magical typing adventure designed to help kids establish healthy typing habits while having fun!
 
