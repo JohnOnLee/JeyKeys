@@ -196,11 +196,115 @@
             }
         }
 
-        /* Main Menu - New Layout (Index-3 Style) */
-        .menu-section {
+        /* Carousel Navigation */
+        .carousel-container {
             width: 100%;
             max-width: 800px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .level-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.6rem;
+            font-weight: bold;
             margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .level-badge-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 10px currentColor;
+            display: inline-block;
+        }
+
+        .carousel-pages {
+            width: 100%;
+            flex: 1;
+        }
+
+        .carousel-page {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .carousel-page.active {
+            display: flex;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .carousel-arrow-left {
+            left: -60px;
+        }
+
+        .carousel-arrow-right {
+            right: -60px;
+        }
+
+        .carousel-arrow.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .page-dots {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .page-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-dot.active {
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
+            transform: scale(1.2);
+        }
+
+        .page-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
         }
 
         .section-title {
@@ -747,27 +851,61 @@
         <!-- Main Menu -->
         <div id="menu-screen" class="screen active">
 
-            <!-- Section 1: Finger Drills (Index-3 Style Order: Top) -->
-            <div class="menu-section">
-                <div class="section-title">🖐 Finger Drills</div>
-                <div class="drills-grid" id="drills-container">
-                    <!-- Javascript will populate -->
+            <!-- Carousel Container -->
+            <div class="carousel-container">
+                <!-- Level Badge -->
+                <div class="level-badge" id="level-badge">
+                    <span class="level-badge-dot" id="badge-dot"></span>
+                    <span id="badge-text">Beginner</span>
                 </div>
-            </div>
 
-            <!-- Section 2: Adventure Levels -->
-            <div class="menu-section">
-                <div class="section-title">🌈 Adventure Levels</div>
-                <div class="levels-grid" id="levels-container">
-                    <!-- Javascript will populate -->
+                <!-- Left Arrow -->
+                <button class="carousel-arrow carousel-arrow-left" id="arrow-left"
+                    onclick="app.navigateMenu(-1)">◀</button>
+
+                <!-- Pages -->
+                <div class="carousel-pages">
+                    <!-- Page 1: Beginner - Finger Drills + Adventure Levels -->
+                    <div class="carousel-page active" id="menu-page-0">
+                        <div class="section-title">🖐 Finger Drills</div>
+                        <div class="drills-grid" id="drills-container">
+                            <!-- Javascript will populate -->
+                        </div>
+                        <div class="section-title" style="margin-top: 10px;">🌈 Adventure Levels</div>
+                        <div class="levels-grid" id="levels-container">
+                            <!-- Javascript will populate -->
+                        </div>
+                    </div>
+
+                    <!-- Page 2: Middle - Sentence Practice -->
+                    <div class="carousel-page" id="menu-page-1">
+                        <div class="section-title">✏️ Sentence Practice</div>
+                        <div id="sentence-container" class="levels-grid"
+                            style="grid-template-columns: repeat(5, 1fr); gap: 10px;">
+                            <!-- Javascript will populate -->
+                        </div>
+                    </div>
+
+                    <!-- Page 3: Expert - Type a Story -->
+                    <div class="carousel-page" id="menu-page-2">
+                        <div class="section-title">📖 Type a Story</div>
+                        <div id="expert-genre-container" class="genre-grid"
+                            style="grid-template-columns: repeat(4, 1fr);">
+                            <!-- Javascript will populate -->
+                        </div>
+                    </div>
                 </div>
-            </div>
 
+                <!-- Right Arrow -->
+                <button class="carousel-arrow carousel-arrow-right" id="arrow-right"
+                    onclick="app.navigateMenu(1)">▶</button>
 
-            <!-- Section 3: Type a Story -->
-            <div class="menu-section">
-                <div class="section-title">📖 Type a Story</div>
-                <button class="btn story-launch-btn" onclick="app.showStoryGenreSelection()">Choose a Story</button>
+                <!-- Dot Indicators -->
+                <div class="page-dots">
+                    <span class="page-dot active" data-page="0" onclick="app.goToMenuPage(0)"></span>
+                    <span class="page-dot" data-page="1" onclick="app.goToMenuPage(1)"></span>
+                    <span class="page-dot" data-page="2" onclick="app.goToMenuPage(2)"></span>
+                </div>
             </div>
 
         </div>
@@ -1004,8 +1142,212 @@
                     }
                 ];
 
+                this.sentenceCategories = [
+                    {
+                        id: 'greetings', name: 'Greetings', icon: '👋', sentences: [
+                            "Hello, how are you today?",
+                            "Good morning, it is a nice day.",
+                            "Hi there, my name is Sam.",
+                            "Nice to meet you, I am glad.",
+                            "See you later, have a good day!",
+                            "Welcome to our school, come in."
+                        ]
+                    },
+                    {
+                        id: 'school', name: 'At School', icon: '🏫', sentences: [
+                            "I like to read books at school.",
+                            "The teacher gave us fun homework.",
+                            "We played outside during lunch break.",
+                            "My best friend sits next to me.",
+                            "We learned about planets in science.",
+                            "The art class was so much fun."
+                        ]
+                    },
+                    {
+                        id: 'food', name: 'Yummy Food', icon: '🍕', sentences: [
+                            "I had a big bowl of soup.",
+                            "Mom baked a yummy chocolate cake.",
+                            "We ate pizza for dinner tonight.",
+                            "The fresh fruit salad was so sweet.",
+                            "Dad made pancakes for our breakfast.",
+                            "I drank a cold glass of milk."
+                        ]
+                    },
+                    {
+                        id: 'weather', name: 'Weather', icon: '🌤️', sentences: [
+                            "The sun is shining very bright today.",
+                            "It is raining outside, grab your coat.",
+                            "The wind blows the leaves around fast.",
+                            "We built a snowman in the cold snow.",
+                            "A big rainbow appeared after the rain.",
+                            "The clouds look like fluffy white sheep."
+                        ]
+                    },
+                    {
+                        id: 'sports', name: 'Fun Sports', icon: '⚽', sentences: [
+                            "I kicked the ball into the big goal.",
+                            "She ran very fast and won the race.",
+                            "We jumped rope during our play time.",
+                            "He threw the ball across the green field.",
+                            "The swim team practiced in the big pool.",
+                            "They played basketball after school today."
+                        ]
+                    },
+                    {
+                        id: 'home', name: 'At Home', icon: '🏠', sentences: [
+                            "I helped my mom clean the kitchen.",
+                            "We watched a funny movie last night.",
+                            "My dog likes to sleep on the couch.",
+                            "I watered the plants in our garden.",
+                            "Dad fixed the broken chair this morning.",
+                            "We played a fun card game together."
+                        ]
+                    },
+                    {
+                        id: 'animals', name: 'Animals', icon: '🐾', sentences: [
+                            "The cat sat on the warm sunny mat.",
+                            "My puppy loves to chase the red ball.",
+                            "The rabbit has soft white fluffy fur.",
+                            "A bird built a nest in our tall tree.",
+                            "The fish swim fast in the clear water.",
+                            "The hamster runs on his little wheel."
+                        ]
+                    },
+                    {
+                        id: 'family', name: 'My Family', icon: '👨‍👩‍👧‍👦', sentences: [
+                            "My sister likes to draw pretty flowers.",
+                            "Grandma tells us fun stories at night.",
+                            "My brother is very tall and strong.",
+                            "We visit grandpa every single weekend.",
+                            "Mom reads us a book before bedtime.",
+                            "Dad takes us to the park on Sunday."
+                        ]
+                    },
+                    {
+                        id: 'seasons', name: 'Seasons', icon: '🍂', sentences: [
+                            "In spring the flowers bloom everywhere.",
+                            "Summer days are long and very warm.",
+                            "Autumn leaves turn red and orange and gold.",
+                            "Winter brings cold snow and icy winds.",
+                            "I love to jump in the leaf piles.",
+                            "We drink hot cocoa on cold winter days."
+                        ]
+                    },
+                    {
+                        id: 'garden', name: 'In the Garden', icon: '🌻', sentences: [
+                            "The sunflower grew taller than the fence.",
+                            "We planted seeds in the soft brown dirt.",
+                            "A butterfly landed on the pink flower.",
+                            "The bees buzz around the garden all day.",
+                            "I picked some ripe red tomatoes today.",
+                            "The frog hides under the big green leaf."
+                        ]
+                    },
+                    {
+                        id: 'music', name: 'Music Fun', icon: '🎵', sentences: [
+                            "I play the drums very loud and fast.",
+                            "She sings a pretty song for the class.",
+                            "We clap our hands to the fun music.",
+                            "The piano makes a very lovely sound.",
+                            "He plays the guitar with both his hands.",
+                            "We dance and spin to our best songs."
+                        ]
+                    },
+                    {
+                        id: 'beach', name: 'At the Beach', icon: '🏖️', sentences: [
+                            "We built a sand castle by the water.",
+                            "The waves splash on the warm sandy shore.",
+                            "I found a pretty shell in the wet sand.",
+                            "We swam in the cool blue ocean water.",
+                            "The seagulls fly high over the big waves.",
+                            "I put on sunscreen before going outside."
+                        ]
+                    },
+                    {
+                        id: 'space', name: 'Outer Space', icon: '🚀', sentences: [
+                            "The stars twinkle bright in the dark sky.",
+                            "The moon is round and glows at night.",
+                            "A rocket flies very fast into space.",
+                            "The sun gives us light and keeps us warm.",
+                            "Planets spin around the sun every day.",
+                            "An astronaut floats in space without gravity."
+                        ]
+                    },
+                    {
+                        id: 'colours', name: 'Colours', icon: '🎨', sentences: [
+                            "The sky is blue and the grass is green.",
+                            "I painted a bright red heart on paper.",
+                            "The yellow sun shines on the orange flowers.",
+                            "My purple shirt is my favourite to wear.",
+                            "We mixed blue and yellow to make green.",
+                            "The rainbow has so many pretty colours."
+                        ]
+                    },
+                    {
+                        id: 'numbers', name: 'Fun Numbers', icon: '🔢', sentences: [
+                            "I can count from one to one hundred.",
+                            "There are five apples in the brown basket.",
+                            "She has two cute little kittens at home.",
+                            "We need three eggs to bake a big cake.",
+                            "Ten birds sit on the long wooden fence.",
+                            "I read four books over the school holidays."
+                        ]
+                    },
+                    {
+                        id: 'playground', name: 'Playground', icon: '🎠', sentences: [
+                            "I love the swings because I go so high.",
+                            "We take turns going down the big slide.",
+                            "The monkey bars are hard but so much fun.",
+                            "My friend and I play on the seesaw.",
+                            "We spin really fast on the roundabout.",
+                            "The sandbox is great for digging with shovels."
+                        ]
+                    },
+                    {
+                        id: 'camping', name: 'Camping Trip', icon: '⛺', sentences: [
+                            "We set up the tent near the tall trees.",
+                            "Dad made a campfire to keep us warm.",
+                            "I saw a deer walking through the woods.",
+                            "We roasted marshmallows on long sticks.",
+                            "The night sky was full of bright stars.",
+                            "I slept in a cosy sleeping bag all night."
+                        ]
+                    },
+                    {
+                        id: 'shopping', name: 'Shopping', icon: '🛒', sentences: [
+                            "We went to the shop to buy some food.",
+                            "Mom put apples and bananas in the cart.",
+                            "I helped carry the bags to the car.",
+                            "The bakery smells so good with warm bread.",
+                            "We picked out a birthday card for gran.",
+                            "Dad paid for everything at the checkout."
+                        ]
+                    },
+                    {
+                        id: 'holidays', name: 'Holidays', icon: '🎄', sentences: [
+                            "We decorated the tree with shiny lights.",
+                            "I got a wonderful present for my birthday.",
+                            "We watched the fireworks light up the sky.",
+                            "Easter eggs were hidden around the garden.",
+                            "We sang carols with our friends and family.",
+                            "The holiday parade had colourful floats."
+                        ]
+                    },
+                    {
+                        id: 'ocean', name: 'Under the Sea', icon: '🐠', sentences: [
+                            "The dolphin jumps high out of the water.",
+                            "A sea turtle swims very slow and steady.",
+                            "The jellyfish glows bright under the sea.",
+                            "Coral reefs are full of colourful fish.",
+                            "An octopus has eight long wiggly arms.",
+                            "The whale is the biggest animal in the sea."
+                        ]
+                    }
+                ];
+
                 this.highScore = localStorage.getItem('kidsTypeHighScore') || 0;
                 this.levelProgress = JSON.parse(localStorage.getItem('kidsTypeProgress')) || {};
+                this.currentMenuPage = 0;
 
                 document.getElementById('menu-highscore').innerText = this.highScore;
 
@@ -1014,6 +1356,7 @@
                 this.initThemePicker();
                 this.loadTheme();
                 this.bindEvents();
+                this.updateMenuPage();
             }
 
             renderMenu() {
@@ -1046,6 +1389,54 @@
                     card.onclick = () => this.startMode('adventure', idx);
                     levelContainer.appendChild(card);
                 });
+
+                // 3. Sentence Categories
+                const sentenceContainer = document.getElementById('sentence-container');
+                sentenceContainer.innerHTML = '';
+                this.sentenceCategories.forEach(cat => {
+                    const card = document.createElement('div');
+                    card.className = 'level-card';
+                    card.style.padding = '12px';
+                    card.style.minHeight = '70px';
+                    card.innerHTML = `<span style="font-size: 1.8rem;">${cat.icon}</span><span class="level-name" style="font-size: 0.85rem; margin-top: 4px;">${cat.name}</span>`;
+                    card.onclick = () => this.startSentenceMode(cat);
+                    sentenceContainer.appendChild(card);
+                });
+
+                // 4. Expert Genre Cards
+                const expertContainer = document.getElementById('expert-genre-container');
+                expertContainer.innerHTML = '';
+                this.storyGenres.forEach(genre => {
+                    const card = document.createElement('div');
+                    card.className = 'genre-card';
+                    card.innerHTML = `<div class="genre-icon">${genre.icon}</div><div class="genre-name">${genre.name}</div>`;
+                    card.onclick = () => this.showStorySelection(genre);
+                    expertContainer.appendChild(card);
+                });
+            }
+
+            startSentenceMode(category) {
+                this.currentMode = 'sentence';
+                document.getElementById('menu-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+                this.score = 0;
+                this.currentIndex = 0;
+                this.isPlaying = true;
+                this.timer = 0;
+                const displayArea = document.getElementById('display-area');
+                if (displayArea) displayArea.scrollTop = 0;
+                // Pick 3 random sentences from the category
+                const shuffled = [...category.sentences].sort(() => Math.random() - 0.5);
+                this.text = shuffled.slice(0, 3).join('\n');
+                document.getElementById('level-name').innerText = category.name;
+                this.renderText();
+                this.updateStats();
+                this.highlightNextKey();
+                clearInterval(this.timerInterval);
+                this.timerInterval = setInterval(() => {
+                    this.timer++;
+                    this.updateStats();
+                }, 1000);
             }
 
             initKeyboard() {
@@ -1150,6 +1541,46 @@
                 }
             }
 
+
+            navigateMenu(direction) {
+                const newPage = this.currentMenuPage + direction;
+                if (newPage >= 0 && newPage <= 2) {
+                    this.goToMenuPage(newPage);
+                }
+            }
+
+            goToMenuPage(pageIndex) {
+                this.currentMenuPage = pageIndex;
+                this.updateMenuPage();
+            }
+
+            updateMenuPage() {
+                const pages = document.querySelectorAll('.carousel-page');
+                pages.forEach((p, i) => {
+                    p.classList.toggle('active', i === this.currentMenuPage);
+                });
+
+                // Update dots
+                const dots = document.querySelectorAll('.page-dot');
+                dots.forEach((d, i) => {
+                    d.classList.toggle('active', i === this.currentMenuPage);
+                });
+
+                // Update arrows
+                document.getElementById('arrow-left').classList.toggle('hidden', this.currentMenuPage === 0);
+                document.getElementById('arrow-right').classList.toggle('hidden', this.currentMenuPage === 2);
+
+                // Update badge
+                const badges = [
+                    { text: '🟢 Beginner', color: '#22c55e' },
+                    { text: '🟡 Middle', color: '#eab308' },
+                    { text: '🔴 Expert', color: '#ef4444' }
+                ];
+                const badge = badges[this.currentMenuPage];
+                document.getElementById('badge-text').innerText = badge.text;
+                document.getElementById('badge-dot').style.background = badge.color;
+                document.getElementById('badge-dot').style.boxShadow = `0 0 10px ${badge.color}`;
+            }
 
             showStoryGenreSelection() {
                 const container = document.getElementById('genre-container');
