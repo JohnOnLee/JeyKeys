@@ -1237,6 +1237,16 @@
                         <div class="topic-name">Numbers</div>
                         <div class="topic-desc">Count & Sequence</div>
                     </div>
+                    <div class="math-topic-card" onclick="app.startMathGame('time')">
+                        <span class="topic-icon">🕒</span>
+                        <div class="topic-name">Time</div>
+                        <div class="topic-desc">Clock logic</div>
+                    </div>
+                    <div class="math-topic-card" onclick="app.startMathGame('mental')">
+                        <span class="topic-icon">🧠</span>
+                        <div class="topic-name">Mental Maths</div>
+                        <div class="topic-desc">Mixed equations</div>
+                    </div>
                 </div>
             </div>
 
@@ -1268,6 +1278,32 @@
             </div>
         </div>
     </div> <!-- Close container -->
+
+    <!-- Math Difficulty Selection Modal -->
+    <div id="math-difficulty-modal" class="overlay">
+        <div class="modal" style="max-width: 500px;">
+            <h2 id="math-difficulty-title">Select Difficulty</h2>
+            <div class="genre-grid" style="margin-top: 20px;">
+                <div class="genre-card" tabindex="0" onclick="app.launchMathGame('easy')"
+                    style="padding: 15px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 5px;">🟢</div>
+                    <div style="font-weight: bold; font-size: 1.2rem;">Easy</div>
+                </div>
+                <div class="genre-card" tabindex="0" onclick="app.launchMathGame('medium')"
+                    style="padding: 15px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 5px;">🟡</div>
+                    <div style="font-weight: bold; font-size: 1.2rem;">Medium</div>
+                </div>
+                <div class="genre-card" tabindex="0" onclick="app.launchMathGame('hard')"
+                    style="padding: 15px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 5px;">🔴</div>
+                    <div style="font-weight: bold; font-size: 1.2rem;">Hard</div>
+                </div>
+            </div>
+            <button class="btn" onclick="document.getElementById('math-difficulty-modal').classList.remove('active')"
+                style="margin-top: 20px;">Cancel</button>
+        </div>
+    </div>
 
     <!-- Story Genre Modal -->
     <div id="story-genre-modal" class="overlay">
@@ -1985,6 +2021,13 @@
             // === MATH GAME LOGIC ===
             startMathGame(topic) {
                 this.mathTopic = topic;
+                document.getElementById('math-difficulty-modal').classList.add('active');
+            }
+
+            launchMathGame(difficulty) {
+                this.mathDifficulty = difficulty;
+                document.getElementById('math-difficulty-modal').classList.remove('active');
+
                 this.mathCorrect = 0;
                 this.mathWrong = 0;
                 this.mathTotal = 0;
@@ -2017,47 +2060,176 @@
             }
 
             generateMathProblem() {
-                let a, b, op, answer, display;
+                let a, b, answer, display;
+                const dist = this.mathDifficulty || 'medium';
 
                 if (this.mathTopic === 'addition') {
-                    a = Math.floor(Math.random() * 50) + 1;
-                    b = Math.floor(Math.random() * 50) + 1;
-                    op = '+'; answer = a + b;
+                    if (dist === 'easy') {
+                        a = Math.floor(Math.random() * 10) + 1;
+                        b = Math.floor(Math.random() * 10) + 1;
+                    } else if (dist === 'medium') {
+                        a = Math.floor(Math.random() * 50) + 1;
+                        b = Math.floor(Math.random() * 50) + 1;
+                    } else { // Hard
+                        a = Math.floor(Math.random() * 150) + 50;
+                        b = Math.floor(Math.random() * 150) + 50;
+                    }
+                    answer = a + b;
                     display = `${a} + ${b} = ?`;
                 } else if (this.mathTopic === 'subtraction') {
-                    a = Math.floor(Math.random() * 50) + 1;
-                    b = Math.floor(Math.random() * 50) + 1;
+                    if (dist === 'easy') {
+                        a = Math.floor(Math.random() * 10) + 1;
+                        b = Math.floor(Math.random() * 10) + 1;
+                    } else if (dist === 'medium') {
+                        a = Math.floor(Math.random() * 50) + 1;
+                        b = Math.floor(Math.random() * 50) + 1;
+                    } else { // Hard
+                        a = Math.floor(Math.random() * 150) + 50;
+                        b = Math.floor(Math.random() * 150) + 50;
+                    }
                     if (a < b) [a, b] = [b, a];
-                    op = '-'; answer = a - b;
+                    answer = a - b;
                     display = `${a} - ${b} = ?`;
                 } else if (this.mathTopic === 'multiplication') {
-                    a = Math.floor(Math.random() * 12) + 1;
-                    b = Math.floor(Math.random() * 12) + 1;
-                    op = '×'; answer = a * b;
+                    if (dist === 'easy') {
+                        a = Math.floor(Math.random() * 5) + 1;
+                        b = Math.floor(Math.random() * 5) + 1;
+                    } else if (dist === 'medium') {
+                        a = Math.floor(Math.random() * 12) + 1;
+                        b = Math.floor(Math.random() * 12) + 1;
+                    } else { // Hard
+                        a = Math.floor(Math.random() * 16) + 10; // 10-25
+                        b = Math.floor(Math.random() * 11) + 2;  // 2-12
+                    }
+                    answer = a * b;
                     display = `${a} × ${b} = ?`;
                 } else if (this.mathTopic === 'division') {
                     // Generate clean division (no remainders)
-                    b = Math.floor(Math.random() * 12) + 1;
-                    answer = Math.floor(Math.random() * 12) + 1;
+                    let limits = { easy: { div: 5, ans: 5 }, medium: { div: 12, ans: 12 }, hard: { div: 15, ans: 20 } };
+                    let l = limits[dist];
+                    b = Math.floor(Math.random() * l.div) + 1;
+                    answer = Math.floor(Math.random() * l.ans) + 1;
                     a = b * answer;
                     display = `${a} ÷ ${b} = ?`;
                 } else if (this.mathTopic === 'fractions') {
-                    // Simple fraction questions: What is a/b of c?
-                    const fracs = [
-                        [1, 2], [1, 3], [1, 4], [2, 3], [3, 4], [1, 5], [2, 5]
-                    ];
+                    let fracs, maxMult;
+                    if (dist === 'easy') {
+                        fracs = [[1, 2], [1, 3]];
+                        maxMult = 5;
+                    } else if (dist === 'medium') {
+                        fracs = [[1, 4], [2, 3], [3, 4], [1, 5]];
+                        maxMult = 8;
+                    } else { // Hard
+                        fracs = [[2, 5], [3, 5], [4, 5], [1, 6], [5, 6], [3, 8]];
+                        maxMult = 12;
+                    }
                     const frac = fracs[Math.floor(Math.random() * fracs.length)];
-                    // Pick a number that divides evenly
-                    const multiplier = Math.floor(Math.random() * 8) + 2;
+                    const multiplier = Math.floor(Math.random() * maxMult) + 2;
                     const whole = frac[1] * multiplier;
                     answer = frac[0] * multiplier;
                     display = `${frac[0]}/${frac[1]} of ${whole} = ?`;
                 } else if (this.mathTopic === 'numbers') {
                     // Sequence: a, a+step, a+2*step, ?
-                    const step = Math.floor(Math.random() * 5) + 1; // Count by 1, 2, 3, 4, or 5
-                    const start = Math.floor(Math.random() * 50) + 1;
+                    let step, start;
+                    if (dist === 'easy') {
+                        step = Math.floor(Math.random() * 2) + 1; // 1 or 2
+                        start = Math.floor(Math.random() * 20) + 1;
+                    } else if (dist === 'medium') {
+                        step = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
+                        start = Math.floor(Math.random() * 50) + 1;
+                    } else { // Hard
+                        const steps = [6, 7, 8, 9, 15, 20];
+                        step = steps[Math.floor(Math.random() * steps.length)];
+                        start = Math.floor(Math.random() * 150) + 50;
+                    }
                     answer = start + (3 * step);
                     display = `${start}, ${start + step}, ${start + 2 * step}, ?`;
+                } else if (this.mathTopic === 'time') {
+                    let startHour = Math.floor(Math.random() * 12) + 1;
+                    let startMin = 0;
+                    let addMins = 0;
+
+                    if (dist === 'easy') {
+                        // Add whole hours
+                        let addHours = Math.floor(Math.random() * 5) + 1;
+                        addMins = addHours * 60;
+                        display = `What is ${addHours} hour(s) after ${startHour}:00? (Just type the hour)`;
+
+                        let endHour = startHour + addHours;
+                        if (endHour > 12) endHour -= 12;
+                        answer = endHour;
+
+                    } else if (dist === 'medium') {
+                        // Add 15 or 30 mins, staying in same hour
+                        const mins = [15, 30];
+                        startMin = mins[Math.floor(Math.random() * mins.length)];
+                        addMins = mins[Math.floor(Math.random() * mins.length)];
+                        if (startMin + addMins >= 60) addMins = 15; // Force stay in hour
+
+                        let startStr = startMin === 0 ? "00" : startMin;
+                        display = `What is ${addMins} mins after ${startHour}:${startStr}? (Type the minutes)`;
+                        answer = startMin + addMins;
+
+                    } else { // Hard
+                        // Cross the hour mark
+                        const starts = [30, 45];
+                        startMin = starts[Math.floor(Math.random() * starts.length)];
+                        const adds = [20, 30, 45];
+                        addMins = adds[Math.floor(Math.random() * adds.length)];
+
+                        let totalMins = startMin + addMins;
+                        let endHour = startHour + Math.floor(totalMins / 60);
+                        if (endHour > 12) endHour -= 12;
+                        let endMin = totalMins % 60;
+
+                        // User types the full time as a number (e.g., 4:15 -> 415)
+                        display = `What time is ${addMins} mins after ${startHour}:${startMin}? (e.g. 4:15 -> 415)`;
+                        answer = parseInt(`${endHour}${endMin.toString().padStart(2, '0')}`);
+                    }
+
+                } else if (this.mathTopic === 'mental') {
+                    if (dist === 'easy') {
+                        let n1 = Math.floor(Math.random() * 9) + 1;
+                        let n2 = Math.floor(Math.random() * 5) + 1;
+                        let n3 = Math.floor(Math.random() * 5) + 1;
+                        // Always positive result
+                        if (Math.random() < 0.5) {
+                            answer = n1 + n2 - n3;
+                            display = `${n1} + ${n2} - ${n3} = ?`;
+                        } else {
+                            if (n1 - n2 < 1) n1 += 5; // ensure safe
+                            answer = n1 - n2 + n3;
+                            display = `${n1} - ${n2} + ${n3} = ?`;
+                        }
+                    } else if (dist === 'medium') {
+                        let n1 = Math.floor(Math.random() * 20) + 10;
+                        let n2 = Math.floor(Math.random() * 9) + 1;
+                        let n3 = Math.floor(Math.random() * 20) + 1;
+                        if (Math.random() < 0.5) {
+                            answer = n1 + n2 - n3;
+                            display = `${n1} + ${n2} - ${n3} = ?`;
+                        } else {
+                            if (n1 - n2 < 1) n1 += 10;
+                            answer = n1 - n2 + n3;
+                            display = `${n1} - ${n2} + ${n3} = ?`;
+                        }
+                    } else { // Hard (Mix mult/add)
+                        let n1 = Math.floor(Math.random() * 6) + 2;
+                        let n2 = Math.floor(Math.random() * 6) + 2;
+                        let n3 = Math.floor(Math.random() * 20) + 5;
+                        if (Math.random() < 0.5) {
+                            answer = (n1 * n2) + n3;
+                            display = `${n1} × ${n2} + ${n3} = ?`;
+                        } else {
+                            answer = (n1 * n2) - n3;
+                            if (answer < 0) {
+                                answer = (n1 * n2) + n3; // flip to add if negative
+                                display = `${n1} × ${n2} + ${n3} = ?`;
+                            } else {
+                                display = `${n1} × ${n2} - ${n3} = ?`;
+                            }
+                        }
+                    }
                 }
 
                 this.mathAnswer = answer;
