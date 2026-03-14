@@ -1040,7 +1040,7 @@
                     style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; text-shadow: 0 0 5px rgba(0,0,0,0.5);">High
                     Score: <span id="menu-highscore">0</span></span>
                 <button class="btn btn-small" style="background:linear-gradient(45deg, #fbbf24, #f59e0b)"
-                    onclick="app.startMode('game')">⭐ Star Rush</button>
+                    onclick="app.launchStarRush()">⭐ Star Rush</button>
                 <div class="theme-wrapper">
                     <button id="theme-btn" class="btn btn-small"
                         style="background:linear-gradient(45deg, #ec4899, #8b5cf6)">🎨 Theme</button>
@@ -1270,7 +1270,7 @@
                     <span>⏱️ <span id="math-timer">0:00</span></span>
                     <span>✅ <span id="math-correct">0</span></span>
                     <span>❌ <span id="math-wrong">0</span></span>
-                    <span>📊 <span id="math-total">0</span> / 10</span>
+                    <span>📊 <span id="math-total">0</span><span id="math-total-max"> / 10</span></span>
                 </div>
                 <div class="math-problem" id="math-problem">5 + 3 = ?</div>
                 <input type="text" id="math-answer" class="math-answer-input" placeholder="?" autocomplete="off">
@@ -2039,6 +2039,9 @@
                 document.getElementById('math-feedback').innerText = '';
                 document.getElementById('math-feedback').className = 'math-feedback';
 
+                const maxEl = document.getElementById('math-total-max');
+                if (maxEl) maxEl.style.display = 'inline';
+
                 this.updateMathScore();
                 this.generateMathProblem();
 
@@ -2059,11 +2062,84 @@
                 }, 1000);
             }
 
+            launchStarRush() {
+                if (document.getElementById('math-screen').classList.contains('active')) {
+                    this.startMathStarRush();
+                } else {
+                    this.startMode('game');
+                }
+            }
+
+            startMathStarRush() {
+                this.mathTopic = 'starrush';
+                this.mathDifficulty = 'medium';
+                this.mathCorrect = 0;
+                this.mathWrong = 0;
+                this.mathTotal = 0;
+                this.mathMaxProblems = Infinity;
+                this.mathTimer = 60; // 60 seconds count down
+
+                document.getElementById('math-topic-select').style.display = 'none';
+                document.getElementById('math-game-area').classList.add('active');
+                document.getElementById('math-feedback').innerText = '';
+                document.getElementById('math-feedback').className = 'math-feedback';
+
+                // Hide max score limit
+                const maxEl = document.getElementById('math-total-max');
+                if (maxEl) maxEl.style.display = 'none';
+
+                this.updateMathScore();
+                this.generateMathProblem();
+
+                const input = document.getElementById('math-answer');
+                input.value = '';
+                input.disabled = false;
+                input.focus();
+                input.onkeydown = (e) => {
+                    if (e.key === 'Enter') this.checkMathAnswer();
+                };
+
+                clearInterval(this.mathTimerInterval);
+                document.getElementById('math-timer').innerText = '1:00';
+                
+                this.mathTimerInterval = setInterval(() => {
+                    this.mathTimer--;
+                    const mins = Math.max(0, Math.floor(this.mathTimer / 60));
+                    const secs = Math.max(0, this.mathTimer % 60);
+                    document.getElementById('math-timer').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (this.mathTimer <= 0) {
+                        this.endMathStarRush();
+                    }
+                }, 1000);
+            }
+
+            endMathStarRush() {
+                clearInterval(this.mathTimerInterval);
+                const input = document.getElementById('math-answer');
+                input.disabled = true;
+                
+                const feedback = document.getElementById('math-feedback');
+                feedback.innerText = `⏱️ Time's Up! Final Score: ${this.mathCorrect}`;
+                feedback.className = 'math-feedback correct';
+
+                setTimeout(() => {
+                    input.disabled = false;
+                    this.showMathGame(); // Returns to Math Topics screen
+                }, 4000);
+            }
+
             generateMathProblem() {
                 let a, b, answer, display;
                 const dist = this.mathDifficulty || 'medium';
 
-                if (this.mathTopic === 'addition') {
+                let activeTopic = this.mathTopic;
+                if (activeTopic === 'starrush') {
+                    const topics = ['addition', 'subtraction', 'multiplication', 'division', 'fractions', 'numbers', 'time', 'mental'];
+                    activeTopic = topics[Math.floor(Math.random() * topics.length)];
+                }
+
+                if (activeTopic === 'addition') {
                     if (dist === 'easy') {
                         a = Math.floor(Math.random() * 10) + 1;
                         b = Math.floor(Math.random() * 10) + 1;
@@ -2076,7 +2152,7 @@
                     }
                     answer = a + b;
                     display = `${a} + ${b} = ?`;
-                } else if (this.mathTopic === 'subtraction') {
+                } else if (activeTopic === 'subtraction') {
                     if (dist === 'easy') {
                         a = Math.floor(Math.random() * 10) + 1;
                         b = Math.floor(Math.random() * 10) + 1;
@@ -2090,7 +2166,7 @@
                     if (a < b) [a, b] = [b, a];
                     answer = a - b;
                     display = `${a} - ${b} = ?`;
-                } else if (this.mathTopic === 'multiplication') {
+                } else if (activeTopic === 'multiplication') {
                     if (dist === 'easy') {
                         a = Math.floor(Math.random() * 5) + 1;
                         b = Math.floor(Math.random() * 5) + 1;
@@ -2103,7 +2179,7 @@
                     }
                     answer = a * b;
                     display = `${a} × ${b} = ?`;
-                } else if (this.mathTopic === 'division') {
+                } else if (activeTopic === 'division') {
                     // Generate clean division (no remainders)
                     let limits = { easy: { div: 5, ans: 5 }, medium: { div: 12, ans: 12 }, hard: { div: 15, ans: 20 } };
                     let l = limits[dist];
@@ -2111,7 +2187,7 @@
                     answer = Math.floor(Math.random() * l.ans) + 1;
                     a = b * answer;
                     display = `${a} ÷ ${b} = ?`;
-                } else if (this.mathTopic === 'fractions') {
+                } else if (activeTopic === 'fractions') {
                     let fracs, maxMult;
                     if (dist === 'easy') {
                         fracs = [[1, 2], [1, 3]];
@@ -2128,7 +2204,7 @@
                     const whole = frac[1] * multiplier;
                     answer = frac[0] * multiplier;
                     display = `${frac[0]}/${frac[1]} of ${whole} = ?`;
-                } else if (this.mathTopic === 'numbers') {
+                } else if (activeTopic === 'numbers') {
                     // Sequence: a, a+step, a+2*step, ?
                     let step, start;
                     if (dist === 'easy') {
@@ -2144,7 +2220,7 @@
                     }
                     answer = start + (3 * step);
                     display = `${start}, ${start + step}, ${start + 2 * step}, ?`;
-                } else if (this.mathTopic === 'time') {
+                } else if (activeTopic === 'time') {
                     let startHour = Math.floor(Math.random() * 12) + 1;
                     let startMin = 0;
                     let addMins = 0;
@@ -2187,7 +2263,7 @@
                         answer = parseInt(`${endHour}${endMin.toString().padStart(2, '0')}`);
                     }
 
-                } else if (this.mathTopic === 'mental') {
+                } else if (activeTopic === 'mental') {
                     if (dist === 'easy') {
                         let n1 = Math.floor(Math.random() * 9) + 1;
                         let n2 = Math.floor(Math.random() * 5) + 1;
