@@ -437,6 +437,30 @@
             height: auto;
             min-height: 150px;
             word-wrap: break-word;
+        }
+
+        .diary-game-textarea {
+            width: 100%;
+            height: 100%;
+            min-height: 300px;
+            border: none;
+            background: transparent;
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            font-weight: bold;
+            line-height: 1.5;
+            color: #333;
+            resize: none;
+            outline: none;
+            padding: 0;
+            word-wrap: break-word;
+        }
+
+        .diary-game-textarea::placeholder {
+            color: #999;
+            font-style: italic;
+            font-weight: normal;
+        }
             overflow-wrap: break-word;
         }
 
@@ -826,7 +850,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px 20px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -914,7 +938,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding: 50px 20px 20px 20px;
+            padding: 10px 20px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -1027,6 +1051,268 @@
         .math-feedback.wrong {
             color: #ef4444;
         }
+
+        /* --- Diary Styles --- */
+        .diary-screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 20px;
+            animation: fadeIn 0.5s ease;
+            overflow-y: auto;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .diary-screen.active {
+            display: flex;
+        }
+
+        .diary-welcome {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .diary-welcome h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .diary-date {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .diary-textarea {
+            width: 100%;
+            max-width: 600px;
+            height: 200px;
+            padding: 15px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            border-radius: 15px;
+            border: 2px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            resize: none;
+            outline: none;
+        }
+
+        .diary-textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .diary-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .diary-entries-list {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .diary-entry-card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .diary-entry-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .diary-entry-date {
+            font-size: 0.85rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .diary-entry-preview {
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .diary-entry-delete {
+            float: right;
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            opacity: 1;
+        }
+
+        .diary-entry-delete:hover {
+            background: rgba(239, 68, 68, 0.4);
+            transform: scale(1.1);
+        }
+
+        .diary-empty {
+            text-align: center;
+            opacity: 0.7;
+            margin-top: 30px;
+        }
+
+        /* --- Calendar Styles --- */
+        #diary-calendar-container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--glass-border);
+            border-radius: 25px;
+            padding: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 300px;
+        }
+
+        #diary-calendar-container .calendar-days {
+            min-height: 200px;
+        }
+
+        .diary-calendar {
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .calendar-header {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .calendar-month {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+            display: block;
+        }
+
+        .calendar-nav {
+            background: var(--primary);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .calendar-nav:hover {
+            background: var(--secondary);
+        }
+
+        .calendar-today-btn {
+            background: var(--accent);
+            border: none;
+            color: var(--bg-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .calendar-today-btn:hover {
+            opacity: 0.8;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            padding: 8px;
+            color: var(--accent);
+            display: block;
+        }
+
+        .calendar-days {
+            display: grid !important;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            width: 100%;
+            min-height: 200px;
+        }
+
+        .calendar-day {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 12px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.2s;
+            color: white;
+            min-height: 40px;
+        }
+
+        .calendar-day:hover {
+            background: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--accent);
+            background: rgba(163, 230, 53, 0.3);
+        }
+
+        .calendar-day.has-entry {
+            background: rgba(34, 197, 94, 0.5);
+            border: 2px solid var(--primary);
+        }
+
+        .calendar-day.selected {
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--accent);
+        }
+
+        .calendar-day.future {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.future:hover {
+            background: rgba(255,255,255,0.1);
+            transform: none;
+        }
     </style>
 </head>
 
@@ -1034,13 +1320,8 @@
 
     <div class="container">
         <header>
-            <h1>✨ JKeys - Kids Learning Hub</h1>
+            <h1 style="cursor: pointer;" onclick="app.showHome()">✨ JKeys - Kids Learning Hub</h1>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <span
-                    style="font-size: 0.9rem; font-weight: bold; color: #fbbf24; text-shadow: 0 0 5px rgba(0,0,0,0.5);">High
-                    Score: <span id="menu-highscore">0</span></span>
-                <button class="btn btn-small" style="background:linear-gradient(45deg, #fbbf24, #f59e0b)"
-                    onclick="app.launchStarRush()">⭐ Star Rush</button>
                 <div class="theme-wrapper">
                     <button id="theme-btn" class="btn btn-small"
                         style="background:linear-gradient(45deg, #ec4899, #8b5cf6)">🎨 Theme</button>
@@ -1053,7 +1334,8 @@
                         </div>
                     </div>
                 </div>
-                <button id="mute-btn" class="btn btn-small">🔊 Sound On</button>
+                <button id="mute-btn" class="btn btn-small" style="background: linear-gradient(45deg, #1d4ed8, #1e40af)">🔊 Sound On</button>
+                <button class="btn btn-small" style="background: linear-gradient(45deg, #3b82f6, #1d4ed8)" onclick="app.showHome()">🏠 Home</button>
             </div>
         </header>
 
@@ -1073,16 +1355,16 @@
                     <div class="game-title">Math Game</div>
                     <div class="game-desc">Addition, subtraction, multiplication, division, fractions & numbers</div>
                 </div>
+                <div class="game-card" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2)); border-color: rgba(251, 191, 36, 0.4);" onclick="app.showDiary()">
+                    <span class="game-icon">📔</span>
+                    <div class="game-title">My Diary</div>
+                    <div class="game-desc">Write about your day and see past entries</div>
+                </div>
             </div>
         </div>
 
         <!-- Main Menu -->
         <div id="menu-screen" class="screen" style="position: relative;">
-
-            <!-- Back to Hub Button -->
-            <button class="btn btn-small"
-                style="position: absolute; top: 0px; left: 0px; background: rgba(255,255,255,0.1); z-index: 100;"
-                onclick="app.showHome()">⬅ Back to Hub</button>
 
             <!-- Carousel Container -->
             <div class="carousel-container">
@@ -1195,15 +1477,11 @@
 
                 <!-- Top Bar -->
                 <div
-                    style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px;">
-                    <button class="btn btn-small" style="background: rgba(255,255,255,0.1);"
-                        onclick="app.exitMathGame()">⬅
-                        Back to Hub</button>
+                    style="width: 100%; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px;">
                     <div class="section-title"
                         style="margin: 0; border: none; padding: 0; width: auto; text-align: center;">🔢 Choose a Math
                         Topic
                     </div>
-                    <div style="width: 110px;"></div> <!-- Spacer for centering -->
                 </div>
 
                 <div class="math-topic-grid" style="width: 100%;">
@@ -1254,16 +1532,13 @@
             <div id="math-game-area" class="math-game-area">
                 <!-- Top Bar for active game -->
                 <div
-                    style="width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px;">
+                    style="width: 100%; display: flex; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px;">
                     <button class="btn btn-small" style="background: rgba(255,255,255,0.1);"
                         onclick="app.showMathGame()">⬅
                         Topics</button>
                     <div class="section-title"
-                        style="margin: 0; border: none; padding: 0; width: auto; text-align: center;">🔢 Math Challenge
+                        style="margin: 0 auto; border: none; padding: 0; text-align: center;">🔢 Math Challenge
                     </div>
-                    <button class="btn btn-small" style="background: rgba(255,255,255,0.1);"
-                        onclick="app.exitMathGame()">🏠
-                        Home</button>
                 </div>
 
                 <div class="math-score-bar">
@@ -1277,6 +1552,40 @@
                 <div class="math-feedback" id="math-feedback"></div>
             </div>
         </div>
+
+        <!-- Diary Screen -->
+        <div id="diary-screen" class="diary-screen" style="position: relative;">
+            <div style="width: 100%; display: flex; align-items: center; margin-bottom: 10px; border-bottom: 2px solid var(--glass-border); padding-bottom: 8px;">
+                <div class="diary-welcome" style="margin-bottom: 0; border: none;">
+                    <h2 style="margin: 0; font-size: 1.4rem;">📔 My Daily Diary</h2>
+                </div>
+            </div>
+            <div class="diary-date" id="diary-current-date" style="margin-bottom: 10px;"></div>
+
+            <div id="diary-calendar-container" style="display: block;">
+                <div class="diary-calendar">
+                    <div class="calendar-header">
+                        <button class="calendar-nav" onclick="app.prevMonth()">◀</button>
+                        <button class="calendar-today-btn" onclick="app.goToToday()">Today</button>
+                        <div class="calendar-month" id="calendar-month"></div>
+                        <button class="calendar-nav" onclick="app.nextMonth()">▶</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday">Sun</div>
+                        <div class="calendar-weekday">Mon</div>
+                        <div class="calendar-weekday">Tue</div>
+                        <div class="calendar-weekday">Wed</div>
+                        <div class="calendar-weekday">Thu</div>
+                        <div class="calendar-weekday">Fri</div>
+                        <div class="calendar-weekday">Sat</div>
+                    </div>
+                    <div class="calendar-days" id="calendar-days"></div>
+                </div>
+            </div>
+            
+            <div id="diary-entries-container" class="diary-entries-list" style="display: none;"></div>
+        </div>
+
     </div> <!-- Close container -->
 
     <!-- Math Difficulty Selection Modal -->
@@ -1331,7 +1640,8 @@
     <script>
         class TypingApp {
             constructor() {
-                this.soundEnabled = true;
+                this.soundEnabled = localStorage.getItem('jkeysSoundEnabled') !== 'false';
+                document.getElementById('mute-btn').innerText = this.soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
                 this.currentMode = null; // 'drill', 'adventure', 'game'
                 this.currentLevelIndex = 0;
                 this.score = 0;
@@ -1699,8 +2009,6 @@
                 this.levelProgress = JSON.parse(localStorage.getItem('kidsTypeProgress')) || {};
                 this.currentMenuPage = 0;
 
-                document.getElementById('menu-highscore').innerText = this.highScore;
-
                 this.initKeyboard();
                 this.renderMenu();
                 this.initThemePicker();
@@ -1756,6 +2064,16 @@
                 // 4. Expert Genre Cards
                 const expertContainer = document.getElementById('expert-genre-container');
                 expertContainer.innerHTML = '';
+                
+                // Star Rush card
+                const starCard = document.createElement('div');
+                starCard.className = 'genre-card';
+                starCard.style.background = 'linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.3))';
+                starCard.style.border = '2px solid #f59e0b';
+                starCard.innerHTML = `<div class="genre-icon">⭐</div><div class="genre-name" style="color: #fbbf24;">Star Rush</div>`;
+                starCard.onclick = () => this.startMode('game');
+                expertContainer.appendChild(starCard);
+                
                 this.storyGenres.forEach(genre => {
                     const card = document.createElement('div');
                     card.className = 'genre-card';
@@ -1822,6 +2140,7 @@
                 document.getElementById('mute-btn').addEventListener('click', (e) => {
                     this.soundEnabled = !this.soundEnabled;
                     e.target.innerText = this.soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
+                    localStorage.setItem('jkeysSoundEnabled', this.soundEnabled);
                 });
 
                 // Theme panel toggle
@@ -1989,12 +2308,14 @@
             // === HOME SCREEN NAVIGATION ===
             showHome() {
                 this.isPlaying = false;
+                this.diaryMode = false;
                 clearInterval(this.timerInterval);
                 clearInterval(this.mathTimerInterval);
                 document.getElementById('home-screen').classList.add('active');
                 document.getElementById('menu-screen').classList.remove('active');
                 document.getElementById('game-screen').classList.remove('active');
                 document.getElementById('math-screen').classList.remove('active');
+                document.getElementById('diary-screen').classList.remove('active');
                 document.getElementById('result-modal').classList.remove('active');
             }
 
@@ -2016,6 +2337,234 @@
             exitMathGame() {
                 clearInterval(this.mathTimerInterval);
                 this.showHome();
+            }
+
+            // === DIARY FUNCTIONS ===
+            showDiary() {
+                document.getElementById('home-screen').classList.remove('active');
+                document.getElementById('diary-screen').classList.add('active');
+                document.getElementById('diary-entries-container').style.display = 'none';
+                document.getElementById('diary-calendar-container').style.display = 'block';
+                
+                this.calendarYear = new Date().getFullYear();
+                this.calendarMonth = new Date().getMonth();
+                this.selectedDate = new Date().toISOString().split('T')[0];
+                
+                this.renderCalendar();
+                this.updateSelectedDateDisplay();
+                const dateObj = new Date(this.selectedDate + 'T00:00:00');
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('diary-current-date').innerText = dateObj.toLocaleDateString('en-US', options);
+            }
+
+            renderCalendar() {
+                if (this.calendarMonth === undefined) {
+                    this.calendarMonth = new Date().getMonth();
+                }
+                if (this.calendarYear === undefined) {
+                    this.calendarYear = new Date().getFullYear();
+                }
+
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const monthEl = document.getElementById('calendar-month');
+                if (monthEl) {
+                    monthEl.innerText = `${monthNames[this.calendarMonth]} ${this.calendarYear}`;
+                }
+
+                const container = document.getElementById('calendar-days');
+                if (!container) return;
+                container.innerHTML = '';
+
+                const year = this.calendarYear || new Date().getFullYear();
+                const month = this.calendarMonth || 0;
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date().toISOString().split('T')[0];
+                const diaries = this.getDiaries();
+                const entriesMap = {};
+                diaries.forEach(d => entriesMap[d.date] = true);
+
+                // Empty cells for days before first day of month
+                for (let i = 0; i < firstDay; i++) {
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'calendar-day';
+                    emptyCell.style.background = 'transparent';
+                    emptyCell.style.opacity = '0';
+                    container.appendChild(emptyCell);
+                }
+
+                // Days of the month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const dayEl = document.createElement('div');
+                    dayEl.className = 'calendar-day';
+                    dayEl.innerText = day;
+                    dayEl.style.display = 'flex';
+                    dayEl.style.alignItems = 'center';
+                    dayEl.style.justifyContent = 'center';
+
+                    // Check if future
+                    if (dateStr > today) {
+                        dayEl.classList.add('future');
+                    } else {
+                        dayEl.onclick = () => this.selectDate(dateStr);
+                    }
+
+                    // Today
+                    if (dateStr === today) {
+                        dayEl.classList.add('today');
+                        dayEl.id = 'calendar-today';
+                    }
+
+                    // Selected
+                    if (dateStr === this.selectedDate) {
+                        dayEl.classList.add('selected');
+                    }
+
+                    // Has entry
+                    if (entriesMap[dateStr]) {
+                        dayEl.classList.add('has-entry');
+                    }
+
+                    container.appendChild(dayEl);
+                }
+
+                // Scroll to today after rendering
+                this.scrollToToday();
+            }
+
+            scrollToToday() {
+                const todayEl = document.getElementById('calendar-today');
+                if (todayEl) {
+                    todayEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+                }
+            }
+
+            selectDate(dateStr) {
+                this.openDiaryGameMode(dateStr);
+            }
+
+            openDiaryGameMode(dateStr) {
+                this.selectedDate = dateStr;
+                const dateObj = new Date(dateStr + 'T00:00:00');
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                
+                document.getElementById('diary-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+                
+                const displayArea = document.getElementById('display-area');
+                displayArea.innerHTML = '';
+                
+                const diaries = this.getDiaries();
+                const entry = diaries.find(d => d.date === dateStr);
+                const existingContent = entry ? entry.content : '';
+                
+                const textarea = document.createElement('textarea');
+                textarea.className = 'diary-game-textarea';
+                textarea.value = existingContent;
+                textarea.placeholder = 'Write about your day...';
+                displayArea.appendChild(textarea);
+                
+                document.getElementById('level-name').innerText = '📔 ' + dateObj.toLocaleDateString('en-US', options);
+                document.getElementById('timer').parentElement.style.display = 'none';
+                document.getElementById('score').parentElement.style.display = 'none';
+                document.getElementById('level-name').parentElement.style.flex = '1';
+                document.getElementById('level-name').parentElement.style.textAlign = 'center';
+                
+                const exitBtn = document.querySelector('#game-screen .btn-back');
+                if (exitBtn) {
+                    exitBtn.onclick = () => this.returnToDiaryFromGame();
+                }
+                
+                this.diaryMode = true;
+                
+                textarea.focus();
+                
+                document.getElementById('keyboard').style.display = 'block';
+                document.querySelector('.hand-indicators').style.display = 'flex';
+                
+                textarea.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.returnToDiaryFromGame();
+                    }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        const content = textarea.value.trim();
+                        if (content) {
+                            this.saveDiaryFromGame(content);
+                            this.showToast("Diary saved! 🎉");
+                        }
+                    }
+                });
+            }
+
+            returnToDiaryFromGame() {
+                const textarea = document.querySelector('.diary-game-textarea');
+                if (textarea) {
+                    const content = textarea.value.trim();
+                    if (content) {
+                        this.saveDiaryFromGame(content);
+                    }
+                }
+                
+                document.getElementById('timer').parentElement.style.display = '';
+                document.getElementById('score').parentElement.style.display = '';
+                document.getElementById('level-name').parentElement.style.flex = '';
+                document.getElementById('level-name').parentElement.style.textAlign = '';
+                
+                document.getElementById('game-screen').classList.remove('active');
+                document.getElementById('diary-screen').classList.add('active');
+                this.diaryMode = false;
+                
+                this.renderCalendar();
+            }
+
+            saveDiaryFromGame(content) {
+                if (!content) return;
+                
+                const diaries = this.getDiaries();
+                const existingIndex = diaries.findIndex(d => d.date === this.selectedDate);
+                if (existingIndex >= 0) {
+                    diaries[existingIndex].content = content;
+                } else {
+                    diaries.unshift({ date: this.selectedDate, content: content });
+                }
+
+                localStorage.setItem('kidsDiaries', JSON.stringify(diaries));
+                this.showToast("Diary saved! 🎉");
+            }
+
+            prevMonth() {
+                this.calendarMonth--;
+                if (this.calendarMonth < 0) {
+                    this.calendarMonth = 11;
+                    this.calendarYear--;
+                }
+                this.renderCalendar();
+            }
+
+            nextMonth() {
+                this.calendarMonth++;
+                if (this.calendarMonth > 11) {
+                    this.calendarMonth = 0;
+                    this.calendarYear++;
+                }
+                this.renderCalendar();
+            }
+
+            goToToday() {
+                this.calendarYear = new Date().getFullYear();
+                this.calendarMonth = new Date().getMonth();
+                this.selectedDate = new Date().toISOString().split('T')[0];
+                this.renderCalendar();
+            }
+
+            getDiaries() {
+                try {
+                    return JSON.parse(localStorage.getItem('kidsDiaries')) || [];
+                } catch {
+                    return [];
+                }
             }
 
             // === MATH GAME LOGIC ===
@@ -2762,7 +3311,6 @@
                 if (this.currentMode === 'game' && this.score > this.highScore) {
                     this.highScore = this.score;
                     localStorage.setItem('kidsTypeHighScore', this.highScore);
-                    document.getElementById('menu-highscore').innerText = this.highScore;
                 }
 
                 // Show Modal
