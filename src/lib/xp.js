@@ -91,7 +91,10 @@ export function addXp(amount) {
   }
 
   if (leveledUp) {
-    currentLevel.set(level);
+    // Delay updating the level store so the UI progress bar has time to finish transitioning to 100%
+    setTimeout(() => {
+      currentLevel.set(level);
+    }, 600);
   }
 
   return { newTotal, leveledUp, newLevel: level };
