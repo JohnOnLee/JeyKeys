@@ -4,7 +4,8 @@
   import { playerName, playerAvatar, highScore, mathHighScore, levelProgress, diaries } from '../lib/state.js';
   import { totalXp, currentLevel, getLevelTitle, xpProgress, xpToNextLevel } from '../lib/xp.js';
   import { streakCount } from '../lib/streak.js';
-  import { getDailyChallenges, dailyChallengeProgress, isChallengeIndexCompleted, getChallengeIndexProgress } from '../lib/dailyChallenge.js';
+  import { getDailyChallenges, dailyChallengeProgress, isChallengeIndexCompleted, getChallengeIndexProgress, startNextChallengeRound, isChallengeCompleted } from '../lib/dailyChallenge.js';
+  import { showToast } from '../lib/toastStore.js';
   import { unlockedAchievements, badges } from '../lib/achievements.js';
   import { profiles, activeProfileId, switchProfile, createProfile } from '../lib/profiles.js';
 
@@ -18,10 +19,18 @@
   $: activeChallenge = challengesList[activeChallengeIdx];
   $: activeChallengeCompleted = activeChallenge && isChallengeIndexCompleted(activeChallenge.challengeIndex);
   $: activeChallengeProg = activeChallenge && getChallengeIndexProgress(activeChallenge.challengeIndex);
+  $: allChallengesCompleted = isChallengeCompleted();
 
   function navigateChallenge(dir) {
     playSound('click');
     activeChallengeIdx = (activeChallengeIdx + dir + 3) % 3;
+  }
+
+  function triggerNextRound() {
+    playSound('welcome');
+    startNextChallengeRound();
+    showToast("🎉 Bonus Round Started! +50 XP!");
+    activeChallengeIdx = 0;
   }
 
   $: progress = xpProgress($totalXp, $currentLevel);
@@ -186,6 +195,9 @@
             <div class="challenge-title" style="display: flex; align-items: center; gap: 6px;">
               <span>{activeChallengeCompleted ? '✅ Challenge Complete!' : '📋 Daily Challenge'}</span>
               <span style="font-size: 0.65rem; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; color: white;">{activeChallengeIdx + 1}/3</span>
+              {#if activeChallenge.round > 0}
+                <span style="font-size: 0.65rem; background: #fbbf24; padding: 2px 6px; border-radius: 10px; color: #1e1b4b; font-weight: bold;">Round {activeChallenge.round + 1}</span>
+              {/if}
             </div>
             <div class="challenge-desc">{activeChallenge.description}</div>
             {#if activeChallengeCompleted}
@@ -197,7 +209,15 @@
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px;">
-          {#if !activeChallengeCompleted}
+          {#if allChallengesCompleted}
+            <button 
+              style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #1e1b4b; border-radius: 10px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);"
+              on:click|stopPropagation={triggerNextRound}
+              title="Start next round of challenges for +50 XP!"
+            >
+              🔄 Bonus Round (+50 XP)
+            </button>
+          {:else if !activeChallengeCompleted}
             <span style="font-size: 0.8rem; color: #fbbf24; font-weight: bold; white-space: nowrap;">+50 XP</span>
           {/if}
           <!-- Navigation buttons -->

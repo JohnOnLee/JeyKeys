@@ -1,4 +1,5 @@
 import { writable, get } from 'svelte/store';
+import { addXp, XP_DAILY_CHALLENGE } from './xp.js';
 
 // Challenge types
 const challenges = [
@@ -153,4 +154,24 @@ export function getChallengeIndexProgress(index) {
 export function isChallengeCompleted() {
   const active = getDailyChallenges();
   return active.every(ch => isChallengeIndexCompleted(ch.challengeIndex));
+}
+
+// Start next round of daily challenges
+export function startNextChallengeRound() {
+  if (typeof window === 'undefined') return;
+
+  const today = new Date().toISOString().split('T')[0];
+  const current = get(dailyChallengeProgress);
+  const round = current.date === today ? (current.round || 0) : 0;
+  const nextRound = round + 1;
+
+  // Set store with new round and empty progress
+  dailyChallengeProgress.set({
+    date: today,
+    round: nextRound,
+    progress: {}
+  });
+
+  // Award bonus XP
+  addXp(XP_DAILY_CHALLENGE);
 }

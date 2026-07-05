@@ -87,7 +87,7 @@ export function switchProfile(newProfileId) {
     gamesPlayed.set(newData.gamesPlayed || { typing: false, math: false, diary: false });
     storiesCompleted.set(newData.storiesCompleted || 0);
     mathTopicsPlayed.set(newData.mathTopicsPlayed || []);
-    dailyChallengeProgress.set(newData.dailyChallengeProgress || { date: '', challengeIndex: -1, progress: 0, completed: false });
+    dailyChallengeProgress.set(newData.dailyChallengeProgress || { date: '', round: 0, progress: {} });
     diaries.set(newData.diaries || []);
   }
 
@@ -115,7 +115,7 @@ export function createProfile(name, avatar) {
     gamesPlayed: { typing: false, math: false, diary: false },
     storiesCompleted: 0,
     mathTopicsPlayed: [],
-    dailyChallengeProgress: { date: '', challengeIndex: -1, progress: 0, completed: false },
+    dailyChallengeProgress: { date: '', round: 0, progress: {} },
     diaries: []
   };
 
