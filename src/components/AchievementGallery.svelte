@@ -21,7 +21,7 @@
   }
 </script>
 
-<div class="screen active" style="width: 100%; overflow-y: auto;">
+<div class="screen active" style="width: 100%; height: 100%; overflow-y: auto; box-sizing: border-box;">
   <div style="width: 100%; display: flex; align-items: center; justify-content: center; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; margin-bottom: 20px;">
     <h2 style="margin: 0; font-size: 1.5rem; text-align: center;">🏆 Achievement Gallery</h2>
   </div>

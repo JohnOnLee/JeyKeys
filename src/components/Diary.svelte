@@ -252,7 +252,7 @@
 </script>
 
 {#if !isEditing}
-  <div class="screen active" style="width: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
+  <div class="screen active" style="width: 100%; height: 100%; overflow-y: auto; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; box-sizing: border-box;">
     <div style="width: 100%; max-width: 850px; display: flex; flex-direction: column; align-items: center; padding-bottom: 30px;">
       <div style="width: 100%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border-bottom: 2px solid var(--glass-border); padding-bottom: 8px;">
         <h2 style="margin: 0; font-size: 1.4rem; text-align: center;">📔 My Daily Diary</h2>
