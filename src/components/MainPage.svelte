@@ -20,11 +20,11 @@
   }
 
   let activeChallengeIdx = 0;
-  $: challengesList = getDailyChallenges();
+  $: challengesList = $dailyChallengeProgress ? getDailyChallenges() : [];
   $: activeChallenge = challengesList[activeChallengeIdx];
-  $: activeChallengeCompleted = activeChallenge && isChallengeIndexCompleted(activeChallenge.challengeIndex);
-  $: activeChallengeProg = activeChallenge && getChallengeIndexProgress(activeChallenge.challengeIndex);
-  $: allChallengesCompleted = isChallengeCompleted();
+  $: activeChallengeCompleted = $dailyChallengeProgress && activeChallenge && isChallengeIndexCompleted(activeChallenge.challengeIndex);
+  $: activeChallengeProg = $dailyChallengeProgress && activeChallenge && getChallengeIndexProgress(activeChallenge.challengeIndex);
+  $: allChallengesCompleted = $dailyChallengeProgress && isChallengeCompleted();
 
   function navigateChallenge(dir) {
     playSound('click');
@@ -213,8 +213,8 @@
             <div class="challenge-title" style="display: flex; align-items: center; gap: 6px;">
               <span>{activeChallengeCompleted ? '✅ Challenge Complete!' : '📋 Daily Challenge'}</span>
               <span style="font-size: 0.65rem; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 10px; color: white;">{activeChallengeIdx + 1}/3</span>
-              {#if activeChallenge.round > 0}
-                <span style="font-size: 0.65rem; background: #fbbf24; padding: 2px 6px; border-radius: 10px; color: #1e1b4b; font-weight: bold;">Round {activeChallenge.round + 1}</span>
+              {#if $dailyChallengeProgress.round > 0}
+                <span style="font-size: 0.65rem; background: #fbbf24; padding: 2px 6px; border-radius: 10px; color: #1e1b4b; font-weight: bold;">Round {$dailyChallengeProgress.round + 1}</span>
               {/if}
             </div>
             <div class="challenge-desc">{activeChallenge.description}</div>
