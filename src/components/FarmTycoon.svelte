@@ -1164,7 +1164,25 @@
     display: flex;
     flex-direction: column;
     height: calc(100% - 45px);
-    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+  }
+
+  /* Custom scrollbar styling for a premium scroll experience */
+  .tab-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .tab-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .tab-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+  }
+  .tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
 
   /* Glassmorphic Container */
@@ -1177,7 +1195,7 @@
     padding: 14px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    flex-shrink: 0; /* Prevent shrinking so sections layout naturally and scroll */
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
   }
 
