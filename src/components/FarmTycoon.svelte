@@ -78,6 +78,7 @@
 
     playSound('correct');
     showToast(`Bought ${item.name}! 🪙-${item.price}`);
+    selectedTool = item;
     saveCurrentProfileState();
   }
 
