@@ -729,7 +729,11 @@
                   {@const qty = $farmInventory.goods?.[key] || 0}
                   {@const meta = goodsMetadata[key]}
                   <div class="goods-card">
-                    <span class="goods-emoji">{meta.emoji}</span>
+                    {#if meta.tile}
+                      <img src="/assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
+                    {:else}
+                      <span class="goods-emoji">{meta.emoji}</span>
+                    {/if}
                     <div style="text-align: left; flex: 1;">
                       <div class="goods-card-name">{meta.name}</div>
                       <div class="goods-card-qty">Count: <strong>{qty}</strong></div>
@@ -763,7 +767,11 @@
                 {@const meta = goodsMetadata[key]}
                 {@const price = MARKET_PRICES[key]}
                 <div class="market-row">
-                  <span style="font-size: 1.6rem; line-height: 1;">{meta.emoji}</span>
+                  {#if meta.tile}
+                    <img src="/assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
+                  {:else}
+                    <span style="font-size: 1.6rem; line-height: 1; margin-right: 8px;">{meta.emoji}</span>
+                  {/if}
                   <div style="flex: 1; text-align: left;">
                     <div style="font-weight: bold; font-size: 0.85rem; color: white;">{meta.name}</div>
                     <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.65);">
