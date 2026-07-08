@@ -509,24 +509,24 @@
             title="Row {cell.row + 1}, Col {cell.col + 1}"
           >
             <!-- Grass base texturing under every cell -->
-            <img src="/assets/tinyTown/Tiles/tile_0000.png" alt="grass" class="cell-bg" />
+            <img src="assets/tinyTown/Tiles/tile_0000.png" alt="grass" class="cell-bg" />
 
             <!-- Plowed soil layer for dirt or crop cells -->
             {#if cell.type === 'dirt' || cell.type === 'crop'}
-              <img src="/assets/tinyFarm/Tiles/tile_0000.png" alt="dirt" class="tile-image" />
+              <img src="assets/tinyFarm/Tiles/tile_0000.png" alt="dirt" class="tile-image" />
             {/if}
 
             <!-- Placed Tile (Crops, Animals, etc.) -->
             {#if cell.tileId && cell.tileId !== 'tile_0000'}
-              <img src="/assets/tinyFarm/Tiles/{cell.tileId}.png" alt={cell.tileId} class="tile-image" />
+              <img src="assets/tinyFarm/Tiles/{cell.tileId}.png" alt={cell.tileId} class="tile-image" />
             {/if}
 
             <!-- Placing Ghost Preview -->
             {#if selectedTool && typeof selectedTool === 'object'}
               {#if selectedTool.type === 'seed' && cell.type === 'dirt' && !cell.cropType}
-                <img src="/assets/tinyFarm/Tiles/{CROP_MATURATION[selectedTool.cropType][0]}.png" alt="preview" class="tile-image preview-ghost" />
+                <img src="assets/tinyFarm/Tiles/{CROP_MATURATION[selectedTool.cropType][0]}.png" alt="preview" class="tile-image preview-ghost" />
               {:else if selectedTool.type === 'animal' && (cell.type === 'grass' || cell.type === 'dirt')}
-                <img src="/assets/tinyFarm/Tiles/{selectedTool.tileId}.png" alt="preview" class="tile-image preview-ghost" />
+                <img src="assets/tinyFarm/Tiles/{selectedTool.tileId}.png" alt="preview" class="tile-image preview-ghost" />
               {/if}
             {/if}
 
@@ -622,7 +622,7 @@
                   class:selected={selectedTool && selectedTool.id === item.id}
                   on:click={() => selectTool(item)}
                 >
-                  <img src="/assets/tinyFarm/Tiles/{CROP_MATURATION[item.cropType][3]}.png" alt={item.name} class="catalog-tile-image" />
+                  <img src="assets/tinyFarm/Tiles/{CROP_MATURATION[item.cropType][3]}.png" alt={item.name} class="catalog-tile-image" />
                   <div style="flex: 1; text-align: left;">
                     <div style="font-weight: bold; font-size: 0.85rem; color: white; margin-bottom: 2px;">{item.name}</div>
                     <div class="pill-badge-container">
@@ -659,7 +659,7 @@
                   class:selected={selectedTool && selectedTool.id === item.id}
                   on:click={() => selectTool(item)}
                 >
-                  <img src="/assets/tinyFarm/Tiles/{item.tileId}.png" alt={item.name} class="catalog-tile-image" />
+                  <img src="assets/tinyFarm/Tiles/{item.tileId}.png" alt={item.name} class="catalog-tile-image" />
                   <div style="flex: 1; text-align: left;">
                     <div style="font-weight: bold; font-size: 0.85rem; color: white; margin-bottom: 2px;">{item.name}</div>
                     <div class="pill-badge-container">
@@ -706,9 +706,9 @@
                         on:click={() => selectTool(item)}
                       >
                         {#if item.type === 'seed'}
-                          <img src="/assets/tinyFarm/Tiles/{CROP_MATURATION[item.cropType][0]}.png" alt={item.name} class="inventory-tile-image" />
+                          <img src="assets/tinyFarm/Tiles/{CROP_MATURATION[item.cropType][0]}.png" alt={item.name} class="inventory-tile-image" />
                         {:else}
-                          <img src="/assets/tinyFarm/Tiles/{item.tileId}.png" alt={item.name} class="inventory-tile-image" />
+                          <img src="assets/tinyFarm/Tiles/{item.tileId}.png" alt={item.name} class="inventory-tile-image" />
                         {/if}
                         <div class="inventory-item-name">{item.name}</div>
                         <span class="qty-badge">{qty}</span>
@@ -730,7 +730,7 @@
                   {@const meta = goodsMetadata[key]}
                   <div class="goods-card">
                     {#if meta.tile}
-                      <img src="/assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
+                      <img src="assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
                     {:else}
                       <span class="goods-emoji">{meta.emoji}</span>
                     {/if}
@@ -768,7 +768,7 @@
                 {@const price = MARKET_PRICES[key]}
                 <div class="market-row">
                   {#if meta.tile}
-                    <img src="/assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
+                    <img src="assets/tinyFarm/Tiles/{meta.tile}.png" alt={meta.name} style="width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; margin-right: 8px;" />
                   {:else}
                     <span style="font-size: 1.6rem; line-height: 1; margin-right: 8px;">{meta.emoji}</span>
                   {/if}
