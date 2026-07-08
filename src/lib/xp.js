@@ -1,4 +1,6 @@
 import { writable, get } from 'svelte/store';
+import { points, farmXpPool } from './state.js';
+import { tickFarmGrowth } from './farmConfig.js';
 
 // XP award constants
 export const XP_TYPING_CHAR = 1;
@@ -84,6 +86,19 @@ export function addXp(amount) {
   let leveledUp = false;
 
   totalXp.set(newTotal);
+  points.update(p => p + amount);
+  let ticks = 0;
+  farmXpPool.update(pool => {
+    let nextPool = pool + amount;
+    while (nextPool >= 20) {
+      ticks++;
+      nextPool -= 20;
+    }
+    return nextPool;
+  });
+  for (let i = 0; i < ticks; i++) {
+    tickFarmGrowth();
+  }
 
   while (newTotal >= totalXpForLevel(level + 1)) {
     level++;

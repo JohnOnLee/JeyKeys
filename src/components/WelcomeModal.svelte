@@ -1,6 +1,8 @@
 <script>
   import { playSound } from '../lib/audio.js';
   import { profiles, switchProfile, createProfile } from '../lib/profiles.js';
+  import PetAvatar from './PetAvatar.svelte';
+  import { getAvatarAsset } from '../lib/shop.js';
 
   export let show = false;
   export let onComplete = () => {};
@@ -65,9 +67,7 @@
               style="display: flex; flex-direction: column; align-items: center; cursor: pointer;"
               on:click={() => selectProfile(p.id)}
             >
-              <div style="font-size: 3rem; background: rgba(255,255,255,0.1); width: 85px; height: 85px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s;">
-                {p.avatar}
-              </div>
+              <PetAvatar petId={p.avatar} size="medium" />
               <div style="margin-top: 8px; font-weight: bold; font-size: 1rem; color: white;">{p.name}</div>
             </div>
           {/each}
@@ -85,10 +85,11 @@
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 class="avatar-option"
+                style="display: flex; align-items: center; justify-content: center;"
                 class:selected={selectedAvatar === emoji}
                 on:click={() => selectAvatar(emoji)}
               >
-                {emoji}
+                <img src={getAvatarAsset(emoji)} alt={emoji} style="width: 48px; height: 48px; object-fit: contain;" />
               </div>
             {/each}
           </div>

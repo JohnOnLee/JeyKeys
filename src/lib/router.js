@@ -5,7 +5,8 @@ const screenToHash = {
   typing: '#/typing',
   math: '#/math',
   diary: '#/diary',
-  achievements: '#/achievements'
+  achievements: '#/achievements',
+  farmtycoon: '#/farmtycoon'
 };
 
 const hashToScreen = {
@@ -13,7 +14,8 @@ const hashToScreen = {
   '#/typing': 'typing',
   '#/math': 'math',
   '#/diary': 'diary',
-  '#/achievements': 'achievements'
+  '#/achievements': 'achievements',
+  '#/farmtycoon': 'farmtycoon'
 };
 
 const DEFAULT_SCREEN = 'home';

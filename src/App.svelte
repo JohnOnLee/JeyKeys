@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { soundEnabled, activeTheme, playerName, playerAvatar, gamesPlayed } from './lib/state.js';
+  import { soundEnabled, activeTheme, playerName, playerAvatar, gamesPlayed, points } from './lib/state.js';
   import { applyTheme } from './lib/theme.js';
   import { playSound } from './lib/audio.js';
   import { router } from './lib/router.js';
@@ -17,6 +17,7 @@
   import TypingGame from './components/TypingGame.svelte';
   import MathGame from './components/MathGame.svelte';
   import Diary from './components/Diary.svelte';
+  import FarmTycoon from './components/FarmTycoon.svelte';
   
   // New components
   import WelcomeModal from './components/WelcomeModal.svelte';
@@ -136,12 +137,18 @@
     
     <!-- XP Bar in header -->
     {#if $playerName}
-      <div class="xp-bar-container" style="max-width: 300px; margin: 0 20px; flex: 1;">
-        <span class="xp-bar-level">Lv.{$currentLevel}</span>
-        <div class="xp-bar-track">
-          <div class="xp-bar-fill" style="width: {progress * 100}%"></div>
+      <div class="xp-bar-container" style="max-width: 450px; margin: 0 20px; flex: 1; display: flex; align-items: center; gap: 15px;">
+        <div style="flex: 1; display: flex; align-items: center; gap: 5px; min-width: 150px;">
+          <span class="xp-bar-level">Lv.{$currentLevel}</span>
+          <div class="xp-bar-track" style="flex: 1;">
+            <div class="xp-bar-fill" style="width: {progress * 100}%"></div>
+          </div>
+          <span class="xp-bar-xp" style="margin-left: 5px; font-size: 0.75rem;">{xpNeeded} XP to Next</span>
         </div>
-        <span class="xp-bar-xp" style="margin-left: 5px;">{xpNeeded} XP to Next</span>
+        <div style="display: flex; align-items: center; gap: 4px; font-weight: bold; color: #fbbf24; background: rgba(251, 191, 36, 0.15); padding: 4px 10px; border-radius: 10px; border: 1px solid rgba(251, 191, 36, 0.2); font-size: 0.85rem; white-space: nowrap;">
+          <span>🪙</span>
+          <span>{$points} pts</span>
+        </div>
       </div>
     {/if}
 
@@ -188,6 +195,10 @@
     {:else if $router === 'achievements'}
       <div style="width: 100%; height: 100%; position: absolute; left: 0; top: 0;" transition:fade={{ duration: 150 }}>
         <AchievementGallery />
+      </div>
+    {:else if $router === 'farmtycoon'}
+      <div style="width: 100%; height: 100%; position: absolute; left: 0; top: 0;" transition:fade={{ duration: 150 }}>
+        <FarmTycoon />
       </div>
     {/if}
   </main>

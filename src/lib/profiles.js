@@ -1,5 +1,23 @@
 import { writable, get } from 'svelte/store';
-import { playerName, playerAvatar, highScore, mathHighScore, levelProgress, gamesPlayed, storiesCompleted, mathTopicsPlayed, diaries } from './state.js';
+import {
+  playerName,
+  playerAvatar,
+  highScore,
+  mathHighScore,
+  levelProgress,
+  gamesPlayed,
+  storiesCompleted,
+  mathTopicsPlayed,
+  diaries,
+  points,
+  farmGrid,
+  farmInventory,
+  defaultFarmGrid,
+  cityGrid,
+  cityInventory,
+  defaultGrid,
+  farmXpPool
+} from './state.js';
 import { totalXp, currentLevel } from './xp.js';
 import { streakCount, lastVisitDate } from './streak.js';
 import { unlockedAchievements } from './achievements.js';
@@ -39,8 +57,10 @@ activeProfileId.subscribe((value) => {
   }
 });
 
-// Helper to save current active profile state to localStorage
-export function saveCurrentProfileState() {
+let saveTimeout = null;
+
+// Direct synchronous save function
+export function saveCurrentProfileStateDirect() {
   const currentId = get(activeProfileId);
   if (!currentId) return;
 
@@ -59,18 +79,51 @@ export function saveCurrentProfileState() {
     storiesCompleted: get(storiesCompleted),
     mathTopicsPlayed: get(mathTopicsPlayed),
     dailyChallengeProgress: get(dailyChallengeProgress),
-    diaries: get(diaries)
+    diaries: get(diaries),
+    points: get(points),
+    farmGrid: get(farmGrid),
+    farmInventory: get(farmInventory),
+    cityGrid: get(cityGrid),
+    cityInventory: get(cityInventory),
+    farmXpPool: get(farmXpPool)
   };
 
   localStorage.setItem(`jkeysProfileData_${currentId}`, JSON.stringify(currentData));
 }
 
+// Debounced save helper to prevent I/O stutters
+export function saveCurrentProfileState() {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  saveTimeout = setTimeout(() => {
+    saveTimeout = null;
+    saveCurrentProfileStateDirect();
+  }, 250);
+}
+
+// Register beforeunload listener to flush pending saves before page close/reload
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+      saveTimeout = null;
+    }
+    saveCurrentProfileStateDirect();
+  });
+}
+
+
 // Function to switch profiles
 export function switchProfile(newProfileId) {
   if (typeof window === 'undefined') return;
 
-  // Save current profile before switching
-  saveCurrentProfileState();
+  // Flush any pending save before switching profile
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+    saveTimeout = null;
+  }
+  saveCurrentProfileStateDirect();
 
   const newData = JSON.parse(localStorage.getItem(`jkeysProfileData_${newProfileId}`) || 'null');
   if (newData) {
@@ -89,6 +142,15 @@ export function switchProfile(newProfileId) {
     mathTopicsPlayed.set(newData.mathTopicsPlayed || []);
     dailyChallengeProgress.set(newData.dailyChallengeProgress || { date: '', round: 0, progress: {} });
     diaries.set(newData.diaries || []);
+    points.set(newData.points !== undefined ? newData.points : 0);
+    farmGrid.set(JSON.parse(JSON.stringify(newData.farmGrid || defaultFarmGrid)));
+    farmInventory.set(newData.farmInventory || {
+      seeds: { wheat: 0, carrot: 0, corn: 0 },
+      goods: { wheat: 0, carrot: 0, corn: 0, egg: 0, wool: 0, milk: 0 }
+    });
+    cityGrid.set(newData.cityGrid || defaultGrid);
+    cityInventory.set(newData.cityInventory || {});
+    farmXpPool.set(newData.farmXpPool || 0);
   }
 
   activeProfileId.set(newProfileId);
@@ -116,7 +178,16 @@ export function createProfile(name, avatar) {
     storiesCompleted: 0,
     mathTopicsPlayed: [],
     dailyChallengeProgress: { date: '', round: 0, progress: {} },
-    diaries: []
+    diaries: [],
+    points: 0,
+    farmGrid: JSON.parse(JSON.stringify(defaultFarmGrid)),
+    farmInventory: {
+      seeds: { wheat: 0, carrot: 0, corn: 0 },
+      goods: { wheat: 0, carrot: 0, corn: 0, egg: 0, wool: 0, milk: 0 }
+    },
+    cityGrid: defaultGrid,
+    cityInventory: {},
+    farmXpPool: 0
   };
 
   localStorage.setItem(`jkeysProfileData_${newId}`, JSON.stringify(freshData));
@@ -159,11 +230,12 @@ export function migrateExistingData() {
       // Create migration profile
       const defaultId = 'profile_default';
       const existingAvatar = get(playerAvatar) || '🦊';
+      const existingXp = get(totalXp);
       
       const migratedData = {
         playerName: existingName,
         playerAvatar: existingAvatar,
-        totalXp: get(totalXp),
+        totalXp: existingXp,
         currentLevel: get(currentLevel),
         highScore: get(highScore),
         mathHighScore: get(mathHighScore),
@@ -175,7 +247,16 @@ export function migrateExistingData() {
         storiesCompleted: get(storiesCompleted),
         mathTopicsPlayed: get(mathTopicsPlayed),
         dailyChallengeProgress: get(dailyChallengeProgress),
-        diaries: get(diaries)
+        diaries: get(diaries),
+        points: existingXp,
+        farmGrid: JSON.parse(JSON.stringify(defaultFarmGrid)),
+        farmInventory: {
+          seeds: { wheat: 0, carrot: 0, corn: 0 },
+          goods: { wheat: 0, carrot: 0, corn: 0, egg: 0, wool: 0, milk: 0 }
+        },
+        cityGrid: defaultGrid,
+        cityInventory: {},
+        farmXpPool: 0
       };
 
       localStorage.setItem(`jkeysProfileData_${defaultId}`, JSON.stringify(migratedData));
@@ -183,6 +264,17 @@ export function migrateExistingData() {
       // Update profiles list
       profiles.set([{ id: defaultId, name: existingName, avatar: existingAvatar }]);
       activeProfileId.set(defaultId);
+
+      // Set the active stores as well
+      points.set(existingXp);
+      farmGrid.set(JSON.parse(JSON.stringify(defaultFarmGrid)));
+      farmInventory.set({
+        seeds: { wheat: 0, carrot: 0, corn: 0 },
+        goods: { wheat: 0, carrot: 0, corn: 0, egg: 0, wool: 0, milk: 0 }
+      });
+      cityGrid.set(defaultGrid);
+      cityInventory.set({});
+      farmXpPool.set(0);
     }
   }
 }

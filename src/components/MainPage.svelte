@@ -1,13 +1,18 @@
 <script>
   import { router } from '../lib/router.js';
   import { playSound } from '../lib/audio.js';
-  import { playerName, playerAvatar, highScore, mathHighScore, levelProgress, diaries } from '../lib/state.js';
+  import { playerName, playerAvatar, highScore, mathHighScore, levelProgress, diaries, points, farmGrid } from '../lib/state.js';
+  import PetAvatar from './PetAvatar.svelte';
+  import { getAvatarAsset } from '../lib/shop.js';
   import { totalXp, currentLevel, getLevelTitle, xpProgress, xpToNextLevel } from '../lib/xp.js';
   import { streakCount } from '../lib/streak.js';
   import { getDailyChallenges, dailyChallengeProgress, isChallengeIndexCompleted, getChallengeIndexProgress, startNextChallengeRound, isChallengeCompleted } from '../lib/dailyChallenge.js';
   import { showToast } from '../lib/toastStore.js';
   import { unlockedAchievements, badges } from '../lib/achievements.js';
   import { profiles, activeProfileId, switchProfile, createProfile } from '../lib/profiles.js';
+
+  $: cropsPlanted = $farmGrid.filter(c => c.type === 'crop').length;
+  $: animalsPlaced = $farmGrid.filter(c => c.type === 'animal').length;
 
   function handleNavigate(screen) {
     playSound('click');
@@ -105,7 +110,9 @@
   <div class="player-profile">
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div class="player-avatar" style="cursor: pointer;" on:click={openProfileManager} title="Switch profile or change avatar">{$playerAvatar || '🎮'}</div>
+    <div style="cursor: pointer;" on:click={openProfileManager} title="Switch profile or change avatar">
+      <PetAvatar petId={$playerAvatar} size="medium" />
+    </div>
     <div class="player-info">
       <div class="player-name">{$playerName || 'Player'}</div>
       <div class="player-title">{levelTitle}</div>
@@ -162,6 +169,17 @@
         <div class="game-desc">Practice typing by writing in your personal journal!</div>
       </div>
       <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8; font-weight: bold; color: var(--accent);">📔 {$diaries.length} entries written</div>
+    </div>
+
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <div class="game-card pet-card" on:click={() => handleNavigate('farmtycoon')}>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+        <span class="game-icon" style="font-size: 2.8rem; line-height: 1;">🚜</span>
+        <div class="game-title">Farm Tycoon</div>
+        <div class="game-desc">Plant seeds, water crops, and raise animals to grow your farm and trade goods for points!</div>
+      </div>
+      <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8; font-weight: bold; color: var(--accent);">🚜 {cropsPlanted} crops • {animalsPlaced} animals</div>
     </div>
   </div>
 
@@ -257,9 +275,7 @@
                   style="display: flex; flex-direction: column; align-items: center; cursor: pointer; opacity: {p.id === $activeProfileId ? '1' : '0.6'}"
                   on:click={() => handleSwitchProfile(p.id)}
                 >
-                  <div style="font-size: 2.2rem; background: rgba(255,255,255,0.1); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid {p.id === $activeProfileId ? '#fbbf24' : 'rgba(255,255,255,0.2)'}; box-shadow: 0 4px 8px rgba(0,0,0,0.2); transition: all 0.2s;">
-                    {p.avatar}
-                  </div>
+                  <PetAvatar petId={p.avatar} size="small" />
                   <div style="margin-top: 6px; font-weight: bold; font-size: 0.8rem; color: white;">{p.name}</div>
                 </div>
               {/each}
@@ -274,11 +290,11 @@
                 <!-- svelte-ignore a11y-no-static-element-interactions -->
                 <div
                   class="avatar-option"
-                  style="font-size: 1.8rem; padding: 5px; border-radius: 10px;"
+                  style="padding: 5px; border-radius: 10px; display: flex; align-items: center; justify-content: center;"
                   class:selected={$playerAvatar === emoji}
                   on:click={() => changeAvatar(emoji)}
                 >
-                  {emoji}
+                  <img src={getAvatarAsset(emoji)} alt={emoji} style="width: 42px; height: 42px; object-fit: contain;" />
                 </div>
               {/each}
             </div>
@@ -301,10 +317,11 @@
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <div
                 class="avatar-option"
+                style="display: flex; align-items: center; justify-content: center;"
                 class:selected={newAvatar === emoji}
                 on:click={() => selectNewAvatar(emoji)}
               >
-                {emoji}
+                <img src={getAvatarAsset(emoji)} alt={emoji} style="width: 42px; height: 42px; object-fit: contain;" />
               </div>
             {/each}
           </div>
