@@ -1,5 +1,5 @@
 import { writable, get } from 'svelte/store';
-import { points, farmXpPool } from './state.js';
+import { points, farmXpPool, advanceTimeTickets } from './state.js';
 import { tickFarmGrowth } from './farmConfig.js';
 
 // XP award constants
@@ -100,12 +100,15 @@ export function addXp(amount) {
     tickFarmGrowth();
   }
 
+  let levelsGained = 0;
   while (newTotal >= totalXpForLevel(level + 1)) {
     level++;
     leveledUp = true;
+    levelsGained++;
   }
 
   if (leveledUp) {
+    advanceTimeTickets.update(t => t + levelsGained);
     // Delay updating the level store so the UI progress bar has time to finish transitioning to 100%
     setTimeout(() => {
       currentLevel.set(level);

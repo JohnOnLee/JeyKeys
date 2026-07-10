@@ -10,6 +10,7 @@ import {
   mathTopicsPlayed,
   diaries,
   points,
+  advanceTimeTickets,
   farmGrid,
   farmInventory,
   defaultFarmGrid,
@@ -81,6 +82,7 @@ export function saveCurrentProfileStateDirect() {
     dailyChallengeProgress: get(dailyChallengeProgress),
     diaries: get(diaries),
     points: get(points),
+    advanceTimeTickets: get(advanceTimeTickets),
     farmGrid: get(farmGrid),
     farmInventory: get(farmInventory),
     cityGrid: get(cityGrid),
@@ -143,6 +145,7 @@ export function switchProfile(newProfileId) {
     dailyChallengeProgress.set(newData.dailyChallengeProgress || { date: '', round: 0, progress: {} });
     diaries.set(newData.diaries || []);
     points.set(newData.points !== undefined ? newData.points : 0);
+    advanceTimeTickets.set(newData.advanceTimeTickets !== undefined ? newData.advanceTimeTickets : 1);
     farmGrid.set(JSON.parse(JSON.stringify(newData.farmGrid || defaultFarmGrid)));
     farmInventory.set(newData.farmInventory || {
       seeds: { wheat: 0, carrot: 0, corn: 0 },
@@ -180,6 +183,7 @@ export function createProfile(name, avatar) {
     dailyChallengeProgress: { date: '', round: 0, progress: {} },
     diaries: [],
     points: 0,
+    advanceTimeTickets: 1,
     farmGrid: JSON.parse(JSON.stringify(defaultFarmGrid)),
     farmInventory: {
       seeds: { wheat: 0, carrot: 0, corn: 0 },
@@ -249,6 +253,7 @@ export function migrateExistingData() {
         dailyChallengeProgress: get(dailyChallengeProgress),
         diaries: get(diaries),
         points: existingXp,
+        advanceTimeTickets: 1,
         farmGrid: JSON.parse(JSON.stringify(defaultFarmGrid)),
         farmInventory: {
           seeds: { wheat: 0, carrot: 0, corn: 0 },
@@ -267,6 +272,7 @@ export function migrateExistingData() {
 
       // Set the active stores as well
       points.set(existingXp);
+      advanceTimeTickets.set(1);
       farmGrid.set(JSON.parse(JSON.stringify(defaultFarmGrid)));
       farmInventory.set({
         seeds: { wheat: 0, carrot: 0, corn: 0 },

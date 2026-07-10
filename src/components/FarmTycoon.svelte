@@ -1,6 +1,6 @@
 <script>
   import { fade, fly } from 'svelte/transition';
-  import { points, farmGrid, farmInventory, defaultFarmGrid } from '../lib/state.js';
+  import { points, farmGrid, farmInventory, defaultFarmGrid, advanceTimeTickets } from '../lib/state.js';
   import { FARM_ITEMS, CROP_MATURATION, MARKET_PRICES, tickFarmGrowth } from '../lib/farmConfig.js';
   import { playSound } from '../lib/audio.js';
   import { router } from '../lib/router.js';
@@ -421,15 +421,16 @@
   }
 
   function triggerGrowthTick() {
-    if ($points < 20) {
+    if ($advanceTimeTickets < 1) {
       playSound('error');
-      showToast("Not enough points to advance time! (Need 🪙 20 pts)");
+      showToast("Not enough tickets to advance time! (Need 🎫 1 ticket)");
       return;
     }
-    points.update(p => p - 20);
+    advanceTimeTickets.update(t => t - 1);
     playSound('correct');
     tickFarmGrowth();
-    showToast("Advanced time! ☀️ 🪙-20");
+    showToast("Advanced time! ☀️ 🎫-1 ticket");
+    saveCurrentProfileState();
   }
 
   // Reactively track inventory entries
@@ -463,7 +464,7 @@
         <span class="badge-val">{activeAnimals} Animals</span>
       </div>
       <button class="btn btn-small" on:click={triggerGrowthTick} style="background: linear-gradient(135deg, #10b981, #059669); padding: 6px 12px; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">
-        ⏳ Advance Time (🪙20)
+        ⏳ Advance Time ({$advanceTimeTickets} 🎟️)
       </button>
     </div>
   </div>
@@ -813,7 +814,7 @@
             <div class="section-title" style="color: #60a5fa; font-size: 0.95rem;">⏳ How to Advance Time</div>
             <div style="font-size: 0.82rem; line-height: 1.5; color: #cbd5e1; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
               <p>📖 <strong>Study & Grow (Free):</strong> Work on Typing games, Math play, or write in your Daily Diary. Every <strong>20 XP</strong> you earn automatically triggers a time growth tick across your entire farm!</p>
-              <p>⚡ <strong>Skip Time (Paid):</strong> Spend <strong>🪙20 points</strong> on the <strong>Advance Time (🪙20)</strong> button in the top bar to advance the farm growth clock instantly.</p>
+              <p>⚡ <strong>Skip Time (Tickets):</strong> Spend <strong>1 Advance Time ticket (🎟️)</strong> on the <strong>Advance Time</strong> button in the top bar to advance the farm growth clock instantly. You get <strong>1 ticket</strong> every time you level up!</p>
             </div>
           </div>
         </div>

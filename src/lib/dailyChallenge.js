@@ -11,26 +11,39 @@ const challenges = [
 ];
 
 // Deterministic selection of 3 daily challenges
-export function getDailyChallenges() {
+export function getDailyChallenges(round) {
   const today = new Date().toISOString().split('T')[0];
+  
+  if (round === undefined) {
+    const current = get(dailyChallengeProgress);
+    round = current && current.date === today ? (current.round || 0) : 0;
+  }
+  
+  const availableChallenges = round > 0 
+    ? challenges.filter(c => c.type !== 'diary') 
+    : challenges;
+
+  const hashSeed = today + (round > 0 ? `-round${round}` : '');
   let hash = 0;
-  for (let i = 0; i < today.length; i++) {
-    hash += today.charCodeAt(i);
+  for (let i = 0; i < hashSeed.length; i++) {
+    hash += hashSeed.charCodeAt(i);
   }
   
   const indices = [];
   let currentHash = hash;
-  // Select 3 unique challenge indexes deterministically
   while (indices.length < 3) {
-    const index = Math.abs(currentHash) % challenges.length;
+    const index = Math.abs(currentHash) % availableChallenges.length;
     if (!indices.includes(index)) {
       indices.push(index);
     }
-    // Modify hash to get next index candidate
     currentHash = Math.floor(currentHash / 7) + 13;
   }
   
-  return indices.map(idx => ({ ...challenges[idx], date: today, challengeIndex: idx }));
+  return indices.map(idx => ({ 
+    ...availableChallenges[idx], 
+    date: today, 
+    challengeIndex: challenges.indexOf(availableChallenges[idx]) 
+  }));
 }
 
 // Helper for backward compatibility

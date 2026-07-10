@@ -111,6 +111,9 @@ export const defaultFarmGrid = Array.from({ length: 64 }, (_, i) => ({
 // 11. points: number store (defaults to 0)
 export const points = createPersistentStore('jkeysPoints', 0);
 
+// 11b. advanceTimeTickets: number store (defaults to 1)
+export const advanceTimeTickets = createPersistentStore('jkeysAdvanceTimeTickets', 1);
+
 // 12. farmGrid: array store (defaults to defaultFarmGrid)
 export const farmGrid = createPersistentStore('jkeysFarmGrid', JSON.parse(JSON.stringify(defaultFarmGrid)));
 

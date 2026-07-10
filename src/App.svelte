@@ -60,14 +60,13 @@
     previousUnlocked = { ...currentUnlocked };
   }
 
-  // React to level changes for celebration and meta check
   $: {
     const lvl = $currentLevel;
     if (lvl > previousLevel) {
       playSound('level-up');
       showLevelUpGlow = true;
       setTimeout(() => { showLevelUpGlow = false; }, 2000);
-      showToast(`🎉 Level Up! You are now Level ${lvl}!`);
+      showToast(`🎉 Level Up! You are now Level ${lvl}! (+1 🎟️ Advance Time Ticket)`);
     }
     previousLevel = lvl;
   }
