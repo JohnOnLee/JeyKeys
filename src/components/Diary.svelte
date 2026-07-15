@@ -8,6 +8,9 @@
   import { addXp, XP_DIARY_ENTRY } from '../lib/xp.js';
   import { unlockAchievement } from '../lib/achievements.js';
   import { updateChallengeProgress } from '../lib/dailyChallenge.js';
+  import { getCaretCoordinates } from '../lib/caret.js';
+  import { simpleWords, adventureLevels } from '../lib/typingContent.js';
+  import { commonEnglishWords } from '../lib/dictionary.js';
 
   let calendarYear = new Date().getFullYear();
   let calendarMonth = new Date().getMonth();
@@ -18,6 +21,154 @@
   let entryContent = '';
   let xpAwarded = false;
   let wordCount = 0;
+
+  // Spelling helper variables
+  let textareaEl;
+  let screenEl;
+  let showSpellingHelper = false;
+  let spellingSuggestions = [];
+  let helperPosition = { top: 0, left: 0 };
+  let activeCaret = null;
+  let popupHeight = 40; // default fallback
+
+  const diaryWords = [
+    'today', 'yesterday', 'tomorrow', 'happy', 'sad', 'went', 'was', 'diary', 'journal', 'wrote',
+    'day', 'school', 'play', 'friend', 'friends', 'fun', 'game', 'games', 'family', 'home',
+    'love', 'good', 'bad', 'great', 'awesome', 'cool', 'nice', 'little', 'big', 'small',
+    'dog', 'cat', 'mom', 'dad', 'brother', 'sister', 'mother', 'father', 'grandma', 'grandpa',
+    'house', 'school', 'teacher', 'class', 'lunch', 'dinner', 'breakfast', 'eat', 'ate', 'food',
+    'pizza', 'cookie', 'cookies', 'ice', 'cream', 'toy', 'toys', 'played', 'playing', 'run',
+    'ran', 'running', 'walk', 'walked', 'walking', 'swim', 'swam', 'swimming', 'jump', 'jumped',
+    'sleep', 'slept', 'sleeping', 'night', 'morning', 'afternoon', 'evening', 'bed', 'time',
+    'week', 'weekend', 'month', 'year', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+    'saturday', 'sunday', 'january', 'february', 'march', 'april', 'may', 'june', 'july',
+    'august', 'september', 'october', 'november', 'december', 'sunny', 'rainy', 'snowy', 'cloudy',
+    'hot', 'cold', 'warm', 'cool', 'weather', 'park', 'zoo', 'beach', 'pool', 'movie', 'book',
+    'books', 'read', 'reading', 'write', 'writing', 'draw', 'drawing', 'paint', 'painting',
+    'song', 'music', 'dance', 'dancing', 'sing', 'singing', 'help', 'helped', 'helping',
+    'happy', 'excited', 'tired', 'sleepy', 'hungry', 'thirsty', 'scared', 'angry', 'surprised',
+    'about', 'after', 'again', 'all', 'am', 'an', 'and', 'are', 'as', 'at', 'be', 'because',
+    'been', 'before', 'but', 'by', 'can', 'could', 'did', 'do', 'does', 'down', 'for', 'from',
+    'get', 'got', 'had', 'has', 'have', 'he', 'her', 'him', 'his', 'how', 'i', 'if', 'in',
+    'into', 'is', 'it', 'its', 'like', 'liked', 'make', 'made', 'me', 'my', 'no', 'not', 'of',
+    'on', 'one', 'or', 'our', 'out', 'over', 'said', 'saw', 'she', 'so', 'some', 'that', 'the',
+    'their', 'them', 'then', 'there', 'they', 'this', 'to', 'too', 'up', 'us', 'very', 'want',
+    'wanted', 'we', 'were', 'what', 'when', 'where', 'which', 'who', 'will', 'with', 'would',
+    'you', 'your', 'yes'
+  ];
+
+  const rawWords = new Set();
+  simpleWords.forEach(w => {
+    const clean = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (clean) rawWords.add(clean);
+  });
+  adventureLevels.forEach(lvl => {
+    lvl.words.forEach(w => {
+      const parts = w.toLowerCase().split(/[\s_-]+/);
+      parts.forEach(part => {
+        const clean = part.replace(/[^a-z]/g, '');
+        if (clean) rawWords.add(clean);
+      });
+    });
+  });
+  diaryWords.forEach(w => {
+    const clean = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (clean) rawWords.add(clean);
+  });
+  commonEnglishWords.forEach(w => {
+    const clean = w.toLowerCase().replace(/[^a-z]/g, '');
+    if (clean) rawWords.add(clean);
+  });
+  const spellingDictionary = Array.from(rawWords);
+
+  function levenshtein(a, b) {
+    const tmp = [];
+    let i, j;
+    for (i = 0; i <= a.length; i++) tmp[i] = [i];
+    for (j = 0; j <= b.length; j++) tmp[0][j] = j;
+    for (i = 1; i <= a.length; i++) {
+      for (j = 1; j <= b.length; j++) {
+        tmp[i][j] = Math.min(
+          tmp[i - 1][j] + 1,
+          tmp[i][j - 1] + 1,
+          tmp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        );
+      }
+    }
+    return tmp[a.length][b.length];
+  }
+
+  function getWordBeforeCursor(text, cursorPosition) {
+    if (cursorPosition <= 0) return '';
+    const textBefore = text.slice(0, cursorPosition);
+    const match = textBefore.match(/[a-zA-Z]+$/);
+    return match ? match[0] : '';
+  }
+
+  function checkSpelling() {
+    if (!textareaEl || !screenEl) return;
+    const cursorPosition = textareaEl.selectionStart;
+    const text = entryContent;
+    const word = getWordBeforeCursor(text, cursorPosition);
+
+    if (!word) {
+      showSpellingHelper = false;
+      activeCaret = null;
+      return;
+    }
+
+    const lowerWord = word.toLowerCase();
+
+    const matches = [];
+    spellingDictionary.forEach(dictWord => {
+      if (dictWord === lowerWord) return;
+      const isPrefix = dictWord.startsWith(lowerWord);
+      const dist = levenshtein(lowerWord, dictWord);
+      if (isPrefix || dist <= 2) {
+        matches.push({
+          word: dictWord,
+          dist: isPrefix ? 0.5 : dist // Prioritize prefix matches
+        });
+      }
+    });
+
+    if (matches.length === 0) {
+      showSpellingHelper = false;
+      activeCaret = null;
+      return;
+    }
+
+    matches.sort((a, b) => {
+      if (a.dist !== b.dist) {
+        return a.dist - b.dist;
+      }
+      return a.word.localeCompare(b.word);
+    });
+
+    spellingSuggestions = matches.slice(0, 3).map(m => m.word);
+
+    const wordStartPos = cursorPosition - word.length;
+    const rect = textareaEl.getBoundingClientRect();
+    const parentRect = screenEl.getBoundingClientRect();
+    const offsetLeft = rect.left - parentRect.left;
+
+    activeCaret = getCaretCoordinates(textareaEl, wordStartPos);
+    const left = Math.max(8, Math.min(offsetLeft + activeCaret.left, parentRect.width - 220));
+    helperPosition.left = left;
+    showSpellingHelper = true;
+  }
+
+  $: if (showSpellingHelper && activeCaret && screenEl && textareaEl) {
+    const rect = textareaEl.getBoundingClientRect();
+    const parentRect = screenEl.getBoundingClientRect();
+    const offsetTop = rect.top - parentRect.top;
+
+    let top = offsetTop + activeCaret.top - popupHeight - 12; // 12px gap above the line
+    if (top < 0) {
+      top = offsetTop + activeCaret.top + activeCaret.height + 8; // float below if off top of screenEl
+    }
+    helperPosition.top = top;
+  }
 
   const writingPrompts = [
     '🌟 What made you smile today?',
@@ -61,6 +212,9 @@
 
   onMount(() => {
     markGamePlayed('diary');
+    showSpellingHelper = false;
+    activeCaret = null;
+    screenEl = null;
   });
 
   $: wordCount = entryContent.trim() ? entryContent.trim().split(/\s+/).length : 0;
@@ -137,6 +291,9 @@
     isEditing = true;
     xpAwarded = false;
     currentPrompt = writingPrompts[Math.floor(Math.random() * writingPrompts.length)];
+    showSpellingHelper = false;
+    activeCaret = null;
+    screenEl = null;
   }
 
   function saveEntry() {
@@ -172,6 +329,9 @@
   function goBackToCalendar() {
     saveEntry();
     isEditing = false;
+    showSpellingHelper = false;
+    activeCaret = null;
+    screenEl = null;
   }
 
   function handleEditorKeyDown(e) {
@@ -193,6 +353,9 @@
     if (isEditing) {
       addDiaryEntry(selectedDate, entryContent.trim() ? entryContent : '');
     }
+    showSpellingHelper = false;
+    activeCaret = null;
+    screenEl = null;
   });
 
   function formatDateLong(dateStr) {
@@ -329,7 +492,11 @@
   </div>
 {:else}
   <!-- Journal Entry Texteditor View inside the standard game screen layout or styling -->
-  <div class="screen active" style="flex: 1; display: flex; flex-direction: column; width: 100%; position: relative;">
+  <div 
+    bind:this={screenEl}
+    class="screen active" 
+    style="flex: 1; display: flex; flex-direction: column; width: 100%; position: relative;"
+  >
     <button class="btn-nav-back" on:click={goBackToCalendar}>↩ Back</button>
     <div style="width: 100%; display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px; border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; min-height: 50px;">
       <h2 style="margin: 0; font-size: 1.3rem; position: absolute; left: 110px;">📔 {formatDateLong(selectedDate)}</h2>
@@ -354,14 +521,30 @@
     </div>
 
     <!-- Textarea and visual keyboard layout -->
-    <div class="display-area" style="flex: 1; min-height: 200px; display: flex; flex-direction: column;">
+    <div class="display-area" style="flex: 1; min-height: 200px; display: flex; flex-direction: column; position: relative;">
       <textarea
         class="diary-game-textarea"
+        bind:this={textareaEl}
         bind:value={entryContent}
         placeholder="Write about your day..."
         on:keydown={handleEditorKeyDown}
+        on:keyup={checkSpelling}
+        on:click={checkSpelling}
       ></textarea>
     </div>
+
+    {#if showSpellingHelper}
+      <div 
+        class="spelling-helper-popup" 
+        bind:clientHeight={popupHeight}
+        style="left: {helperPosition.left}px; top: {helperPosition.top}px;"
+      >
+        <span class="spelling-helper-title">Spelling hint:</span>
+        {#each spellingSuggestions as sug}
+          <span class="spelling-helper-suggestion">{sug}</span>
+        {/each}
+      </div>
+    {/if}
 
     <div style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
       <!-- Show interactive keyboard for visual typing guide -->
