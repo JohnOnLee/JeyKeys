@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { points, farmXpPool, advanceTimeTickets } from './state.js';
 import { tickFarmGrowth } from './farmConfig.js';
+import { saveCurrentProfileState } from './profiles.js';
 
 // XP award constants
 export const XP_TYPING_CHAR = 1;
@@ -74,7 +75,7 @@ export function xpProgress(currentXp, level) {
 
 // Get title for a given level
 export function getLevelTitle(level) {
-  const index = Math.min(level - 1, levelTitles.length - 1);
+  const index = Math.max(0, Math.min(level - 1, levelTitles.length - 1));
   return levelTitles[index];
 }
 
@@ -96,6 +97,7 @@ export function addXp(amount) {
     }
     return nextPool;
   });
+  saveCurrentProfileState();
   for (let i = 0; i < ticks; i++) {
     tickFarmGrowth();
   }
@@ -108,11 +110,8 @@ export function addXp(amount) {
   }
 
   if (leveledUp) {
+    currentLevel.set(level);
     advanceTimeTickets.update(t => t + levelsGained);
-    // Delay updating the level store so the UI progress bar has time to finish transitioning to 100%
-    setTimeout(() => {
-      currentLevel.set(level);
-    }, 600);
   }
 
   return { newTotal, leveledUp, newLevel: level };

@@ -23,6 +23,15 @@
     cow: 'milk'
   };
 
+  const goodsMetadata = {
+    wheat: { name: 'Wheat', emoji: '🌾', tile: 'tile_0068' },
+    carrot: { name: 'Carrot', emoji: '🥕', tile: 'tile_0008' },
+    corn: { name: 'Corn', emoji: '🌽', tile: 'tile_0032' },
+    egg: { name: 'Egg', emoji: '🥚', tile: 'tile_0125' },
+    wool: { name: 'Wool', emoji: '🧶', tile: 'tile_0074' },
+    milk: { name: 'Milk', emoji: '🥛', tile: 'tile_0123' }
+  };
+
   const ANIMAL_FOODS = {
     chicken: 'wheat',
     sheep: 'carrot',
@@ -34,14 +43,13 @@
     return goodsMetadata[food]?.emoji || '🌾';
   }
 
-  const goodsMetadata = {
-    wheat: { name: 'Wheat', emoji: '🌾', tile: 'tile_0068' },
-    carrot: { name: 'Carrot', emoji: '🥕', tile: 'tile_0008' },
-    corn: { name: 'Corn', emoji: '🌽', tile: 'tile_0032' },
-    egg: { name: 'Egg', emoji: '🥚', tile: 'tile_0125' },
-    wool: { name: 'Wool', emoji: '🧶', tile: 'tile_0074' },
-    milk: { name: 'Milk', emoji: '🥛', tile: 'tile_0123' }
-  };
+  function getAnimalHarvestsLeft(cell) {
+    if (cell.harvestsLeft !== undefined) return cell.harvestsLeft;
+    if (cell.animalType === 'chicken') return 4;
+    if (cell.animalType === 'sheep') return 5;
+    if (cell.animalType === 'cow') return 6;
+    return 4;
+  }
 
   function getItemByInventoryKey(key) {
     return FARM_ITEMS.find(item => (item.cropType === key || item.animalType === key));
@@ -139,19 +147,44 @@
       return next;
     });
 
-    farmGrid.update(grid => {
-      const next = [...grid];
-      next[idx] = {
-        ...next[idx],
-        hasProduct: false
-      };
-      return next;
-    });
+    const harvestsLeft = getAnimalHarvestsLeft(cell);
+    const nextHarvests = harvestsLeft - 1;
 
-    playSound('win');
-    const displayProduct = product.charAt(0).toUpperCase() + product.slice(1);
-    const displayEmoji = goodsMetadata[product]?.emoji || '🥛';
-    showToast(`Collected ${displayProduct}! ${displayEmoji}`);
+    if (nextHarvests <= 0) {
+      farmGrid.update(grid => {
+        const next = [...grid];
+        next[idx] = {
+          ...next[idx],
+          type: 'grass',
+          tileId: null,
+          watered: false,
+          fed: false,
+          hasProduct: false,
+          harvestsLeft: undefined,
+          cropType: null,
+          cropStage: 0,
+          animalType: null
+        };
+        return next;
+      });
+      playSound('error');
+      const displayAnimal = animalType.charAt(0).toUpperCase() + animalType.slice(1);
+      showToast(`${displayAnimal} has retired from the farm! 💤`);
+    } else {
+      farmGrid.update(grid => {
+        const next = [...grid];
+        next[idx] = {
+          ...next[idx],
+          hasProduct: false,
+          harvestsLeft: nextHarvests
+        };
+        return next;
+      });
+      playSound('win');
+      const displayProduct = product.charAt(0).toUpperCase() + product.slice(1);
+      const displayEmoji = goodsMetadata[product]?.emoji || '🥛';
+      showToast(`Collected ${displayProduct}! ${displayEmoji} (${nextHarvests} harvests left)`);
+    }
     saveCurrentProfileState();
   }
 
@@ -167,13 +200,10 @@
 
       if (cell.type === 'animal') {
         const animalType = cell.animalType;
-        farmInventory.update(inv => {
-          const next = { ...inv };
-          if (!next.seeds) next.seeds = {};
-          next.seeds[animalType] = (next.seeds[animalType] || 0) + 1;
-          return next;
-        });
-        showToast(`Returned ${animalType} to inventory! 🚜`);
+        const animalItem = FARM_ITEMS.find(item => item.animalType === animalType);
+        const refund = animalItem ? Math.floor(animalItem.price * 0.5) : 0;
+        points.update(p => p + refund);
+        showToast(`Sold ${animalType} for 🪙${refund} refund! 🚜`);
       } else if (cell.type === 'crop') {
         showToast(`Cleared crop! 🚜`);
       } else {
@@ -190,7 +220,9 @@
           cropStage: 0,
           watered: false,
           hasProduct: false,
-          fed: false
+          fed: false,
+          animalType: null,
+          harvestsLeft: undefined
         };
         return next;
       });
@@ -244,7 +276,9 @@
           cropStage: 0,
           watered: false,
           hasProduct: false,
-          fed: false
+          fed: false,
+          animalType: null,
+          harvestsLeft: undefined
         };
         return next;
       });
@@ -350,7 +384,9 @@
           tileId: CROP_MATURATION[cropType][0],
           watered: false,
           hasProduct: false,
-          fed: false
+          fed: false,
+          animalType: null,
+          harvestsLeft: undefined
         };
         return next;
       });
@@ -383,6 +419,17 @@
         return next;
       });
 
+      let harvestsLeft;
+      if (animalType === 'chicken') {
+        harvestsLeft = Math.floor(Math.random() * (5 - 3 + 1)) + 3;
+      } else if (animalType === 'sheep') {
+        harvestsLeft = Math.floor(Math.random() * (6 - 4 + 1)) + 4;
+      } else if (animalType === 'cow') {
+        harvestsLeft = Math.floor(Math.random() * (8 - 5 + 1)) + 5;
+      } else {
+        harvestsLeft = 4;
+      }
+
       farmGrid.update(grid => {
         const next = [...grid];
         next[idx] = {
@@ -392,7 +439,10 @@
           tileId: selectedTool.tileId,
           watered: false,
           hasProduct: false,
-          fed: false
+          fed: false,
+          harvestsLeft,
+          cropType: null,
+          cropStage: 0
         };
         return next;
       });
@@ -408,7 +458,8 @@
       showToast(`Growing ${cell.cropType} (Stage ${cell.cropStage + 1}/4)`);
       playSound('click');
     } else if (cell.type === 'animal') {
-      showToast(`A cute ${cell.animalType}!`);
+      const harvests = getAnimalHarvestsLeft(cell);
+      showToast(`A cute ${cell.animalType}! (${harvests} harvests left)`);
       playSound('click');
     } else if (cell.type === 'dirt') {
       showToast("Tilled soil. Ready for planting!");
@@ -485,14 +536,13 @@
   function triggerGrowthTick() {
     if ($advanceTimeTickets < 1) {
       playSound('error');
-      showToast("Not enough tickets to advance time! (Need 🎫 1 ticket)");
+      showToast("Not enough tickets to advance time! (Need 🎟️ 1 ticket)");
       return;
     }
     advanceTimeTickets.update(t => t - 1);
     playSound('correct');
     tickFarmGrowth();
-    showToast("Advanced time! ☀️ 🎫-1 ticket");
-    saveCurrentProfileState();
+    showToast("Advanced time! ☀️ 🎟️-1 ticket");
   }
 
   // Reactively track inventory entries
@@ -1154,7 +1204,7 @@
 
   .product-bubble {
     position: absolute;
-    top: -14px;
+    top: 6px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(255, 255, 255, 0.95);
@@ -1177,7 +1227,7 @@
       transform: translateX(-50%) translateY(0);
     }
     50% {
-      transform: translateX(-50%) translateY(-6px);
+      transform: translateX(-50%) translateY(-4px);
     }
   }
 
