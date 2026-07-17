@@ -47,20 +47,30 @@ export function tickFarmGrowth() {
         return cell;
       }
 
-      // Animals: if !hasProduct, roll production chance: 60% if watered (fed), 15% if dry.
-      // If they successfully produce, set hasProduct = true and reset watered = false.
-      // If they do NOT produce, keep watered as true (do not waste their food/water!).
+      // Animals: if !hasProduct, roll production chance based on watered and fed.
+      // - Both true: 75% chance (0.75)
+      // - Watered only OR Fed only: 20% chance (0.20)
+      // - Neither: 5% chance (0.05)
+      // If they successfully produce, set hasProduct = true, reset watered = false, and set fed = false.
+      // If they do not produce, keep watered and fed as is.
       if (cell.type === 'animal') {
         if (!cell.hasProduct) {
-          const chance = cell.watered ? 0.60 : 0.15;
+          let chance = 0.05;
+          if (cell.watered && cell.fed) {
+            chance = 0.75;
+          } else if (cell.watered || cell.fed) {
+            chance = 0.20;
+          }
+
           if (Math.random() < chance) {
             return {
               ...cell,
               hasProduct: true,
-              watered: false
+              watered: false,
+              fed: false
             };
           }
-          // Do not produce, so keep watered as is (e.g. true if they were watered)
+          // Do not produce, so keep watered and fed as is
           return cell;
         }
         return cell;

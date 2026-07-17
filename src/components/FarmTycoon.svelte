@@ -23,6 +23,17 @@
     cow: 'milk'
   };
 
+  const ANIMAL_FOODS = {
+    chicken: 'wheat',
+    sheep: 'carrot',
+    cow: 'corn'
+  };
+
+  function getAnimalFoodEmoji(animalType) {
+    const food = ANIMAL_FOODS[animalType];
+    return goodsMetadata[food]?.emoji || '🌾';
+  }
+
   const goodsMetadata = {
     wheat: { name: 'Wheat', emoji: '🌾', tile: 'tile_0068' },
     carrot: { name: 'Carrot', emoji: '🥕', tile: 'tile_0008' },
@@ -103,7 +114,8 @@
         cropType: null,
         cropStage: 0,
         watered: false,
-        hasProduct: false
+        hasProduct: false,
+        fed: false
       };
       return next;
     });
@@ -177,7 +189,8 @@
           cropType: null,
           cropStage: 0,
           watered: false,
-          hasProduct: false
+          hasProduct: false,
+          fed: false
         };
         return next;
       });
@@ -188,6 +201,11 @@
 
     // Priority 2: Prevent watering animal cells that already have a product ready for collection
     if (selectedTool === 'water' && cell.type === 'animal' && cell.hasProduct) {
+      showToast("Collect the product first!");
+      playSound('error');
+      return;
+    }
+    if (selectedTool === 'feed' && cell.type === 'animal' && cell.hasProduct) {
       showToast("Collect the product first!");
       playSound('error');
       return;
@@ -225,7 +243,8 @@
           cropType: null,
           cropStage: 0,
           watered: false,
-          hasProduct: false
+          hasProduct: false,
+          fed: false
         };
         return next;
       });
@@ -254,6 +273,47 @@
       });
       playSound('correct');
       showToast("Watered! 💧");
+      saveCurrentProfileState();
+      return;
+    }
+
+    // Feed tool
+    if (selectedTool === 'feed') {
+      if (cell.type !== 'animal') {
+        showToast("Can only feed animals!");
+        playSound('error');
+        return;
+      }
+      if (cell.fed) {
+        showToast("Already fed!");
+        playSound('click');
+        return;
+      }
+      const requiredFood = ANIMAL_FOODS[cell.animalType];
+      const foodQty = $farmInventory.goods?.[requiredFood] || 0;
+      if (foodQty <= 0) {
+        const foodName = goodsMetadata[requiredFood]?.name || requiredFood;
+        showToast(`No ${foodName} in Barn! Grow and harvest some first!`);
+        playSound('error');
+        return;
+      }
+
+      farmInventory.update(inv => {
+        const next = { ...inv };
+        if (!next.goods) next.goods = {};
+        next.goods[requiredFood] = Math.max(0, (next.goods[requiredFood] || 0) - 1);
+        return next;
+      });
+
+      farmGrid.update(grid => {
+        const next = [...grid];
+        next[idx] = { ...next[idx], fed: true };
+        return next;
+      });
+
+      playSound('correct');
+      const foodEmoji = goodsMetadata[requiredFood]?.emoji || '🌾';
+      showToast(`Fed with ${goodsMetadata[requiredFood]?.name}! ${foodEmoji}`);
       saveCurrentProfileState();
       return;
     }
@@ -289,7 +349,8 @@
           cropStage: 0,
           tileId: CROP_MATURATION[cropType][0],
           watered: false,
-          hasProduct: false
+          hasProduct: false,
+          fed: false
         };
         return next;
       });
@@ -330,7 +391,8 @@
           animalType,
           tileId: selectedTool.tileId,
           watered: false,
-          hasProduct: false
+          hasProduct: false,
+          fed: false
         };
         return next;
       });
@@ -486,6 +548,10 @@
           <span class="banner-icon">💧</span>
           <span class="banner-text">Water tool active - click dry crops or animals to water them</span>
           <button class="banner-close-btn" on:click={() => selectedTool = null} aria-label="Cancel tool">×</button>
+        {:else if selectedTool === 'feed'}
+          <span class="banner-icon">🥣</span>
+          <span class="banner-text">Feed tool active - click hungry animals to feed them crops from your Barn</span>
+          <button class="banner-close-btn" on:click={() => selectedTool = null} aria-label="Cancel tool">×</button>
         {:else if selectedTool === 'bulldozer'}
           <span class="banner-icon">🚜</span>
           <span class="banner-text">Bulldozer active - click cells to clear crops/dirt or return animals</span>
@@ -507,6 +573,7 @@
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div 
             class="grid-cell"
+            class:has-bubble={(cell.type === 'crop' && cell.cropStage === 3) || (cell.type === 'animal' && cell.hasProduct)}
             on:click={() => handleCellClick(idx)}
             title="Row {cell.row + 1}, Col {cell.col + 1}"
           >
@@ -534,8 +601,16 @@
 
             <!-- Watered Overlay glow & icon -->
             {#if cell.watered}
-              <div class="watered-overlay"></div>
+              {#if !(cell.type === 'animal' && cell.fed)}
+                <div class="watered-overlay"></div>
+              {/if}
               <span class="watered-drop">💧</span>
+            {/if}
+
+            <!-- Fed Overlay glow & icon -->
+            {#if cell.type === 'animal' && cell.fed}
+              <div class="fed-overlay" class:both-overlays={cell.watered}></div>
+              <span class="fed-bowl">{getAnimalFoodEmoji(cell.animalType)}</span>
             {/if}
 
             <!-- Floating product collection bubble -->
@@ -577,6 +652,14 @@
         >
           <span class="tool-icon">💧</span>
           <span class="tool-label">Water</span>
+        </button>
+        <button 
+          class="toolbelt-btn" 
+          class:active={selectedTool === 'feed'}
+          on:click={() => selectTool('feed')}
+        >
+          <span class="tool-icon">🥣</span>
+          <span class="tool-label">Feed</span>
         </button>
         <button 
           class="toolbelt-btn" 
@@ -803,7 +886,8 @@
             <div style="font-size: 0.85rem; line-height: 1.5; color: #e2e8f0; display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
               <p>🚜 <strong>Tilling Soil:</strong> Select the <strong>Plow 🚜</strong> tool and click any green grass cell to till it into soil. Plowing costs <strong>🪙5 points</strong>.</p>
               <p>🌱 <strong>Planting:</strong> Select an owned seed from your <strong>Barn & Silo</strong> inventory tab, then click any plowed soil cell to plant it.</p>
-              <p>💧 <strong>Watering:</strong> Select the <strong>Water 💧</strong> tool and click any crop or animal cell. Watering accelerates plant growth and increases animal production speed.</p>
+              <p>💧 <strong>Watering:</strong> Select the <strong>Water 💧</strong> tool and click any crop or animal cell. Crops grow faster, and animals need both water and food to produce goods!</p>
+              <p>🥣 <strong>Feeding Animals:</strong> Select the <strong>Feed 🥣</strong> tool and click a hungry animal to feed them grown crops from your Barn (Chicken eats Wheat 🌾, Sheep eats Carrot 🥕, Cow eats Corn 🌽).</p>
               <p>🐮 <strong>Raising Animals:</strong> Buy animals (Chicken, Sheep, Cow) from the <strong>Buy Shop</strong>. Select them in your Barn, and click any grass or dirt cell to place them on your farm.</p>
               <p>🥚 <strong>Harvesting:</strong> Ripe crops and productive animals will show a bouncy floating product bubble above their heads. Tap the bubble to harvest the item into your Barn inventory!</p>
               <p>⚖️ <strong>Selling Goods:</strong> Go to the <strong>Market</strong> tab to trade your harvested items for points. You can sell items individually or click the <strong>Sell All Goods 💰</strong> button for a wholesale payout!</p>
@@ -933,6 +1017,14 @@
     z-index: 10;
   }
 
+  .grid-cell.has-bubble {
+    z-index: 15;
+  }
+
+  .grid-cell.has-bubble:hover {
+    z-index: 16;
+  }
+
   .grid-cell:active {
     transform: scale(0.95);
   }
@@ -1023,6 +1115,41 @@
   @keyframes drop-float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-2px); }
+  }
+
+  .fed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid rgba(16, 185, 129, 0.8);
+    box-shadow: inset 0 0 8px rgba(16, 185, 129, 0.5);
+    background: rgba(16, 185, 129, 0.12);
+    pointer-events: none;
+    z-index: 4;
+    border-radius: 4px;
+  }
+
+  .fed-overlay.both-overlays {
+    border: 2px solid #a78bfa;
+    box-shadow: inset 0 0 8px rgba(167, 139, 250, 0.5);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.12));
+  }
+
+  .fed-bowl {
+    position: absolute;
+    bottom: 2px;
+    left: 2px;
+    font-size: 0.75rem;
+    z-index: 5;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    animation: bowl-wiggle 3s infinite ease-in-out;
+  }
+
+  @keyframes bowl-wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(10deg) translateY(-1px); }
   }
 
   .product-bubble {

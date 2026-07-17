@@ -105,6 +105,7 @@ export const defaultFarmGrid = Array.from({ length: 64 }, (_, i) => ({
   cropType: null,
   cropStage: 0,
   watered: false,
+  fed: false,
   hasProduct: false
 }));
 
