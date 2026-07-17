@@ -30,6 +30,7 @@
   let helperPosition = { top: 0, left: 0 };
   let activeCaret = null;
   let popupHeight = 40; // default fallback
+  let popupWidth = 200; // default fallback
 
   const diaryWords = [
     'today', 'yesterday', 'tomorrow', 'happy', 'sad', 'went', 'was', 'diary', 'journal', 'wrote',
@@ -148,26 +149,23 @@
     spellingSuggestions = matches.slice(0, 3).map(m => m.word);
 
     const wordStartPos = cursorPosition - word.length;
-    const rect = textareaEl.getBoundingClientRect();
-    const parentRect = screenEl.getBoundingClientRect();
-    const offsetLeft = rect.left - parentRect.left;
-
     activeCaret = getCaretCoordinates(textareaEl, wordStartPos);
-    const left = Math.max(8, Math.min(offsetLeft + activeCaret.left, parentRect.width - 220));
-    helperPosition.left = left;
     showSpellingHelper = true;
   }
 
   $: if (showSpellingHelper && activeCaret && screenEl && textareaEl) {
     const rect = textareaEl.getBoundingClientRect();
     const parentRect = screenEl.getBoundingClientRect();
+    const offsetLeft = rect.left - parentRect.left;
     const offsetTop = rect.top - parentRect.top;
 
-    let top = offsetTop + activeCaret.top - popupHeight - 12; // 12px gap above the line
-    if (top < 0) {
-      top = offsetTop + activeCaret.top + activeCaret.height + 8; // float below if off top of screenEl
+    // Calculate left and top reactively based on measured popup dimensions
+    helperPosition.left = Math.max(10, Math.min(offsetLeft + activeCaret.left, parentRect.width - popupWidth - 10));
+    helperPosition.top = offsetTop + activeCaret.top - popupHeight - 12;
+
+    if (helperPosition.top < 0) {
+      helperPosition.top = offsetTop + activeCaret.top + activeCaret.height + 8;
     }
-    helperPosition.top = top;
   }
 
   const writingPrompts = [
@@ -537,6 +535,7 @@
       <div 
         class="spelling-helper-popup" 
         bind:clientHeight={popupHeight}
+        bind:clientWidth={popupWidth}
         style="left: {helperPosition.left}px; top: {helperPosition.top}px;"
       >
         <span class="spelling-helper-title">Spelling hint:</span>
